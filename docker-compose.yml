@@ -1,0 +1,21 @@
+version: "3"
+services:
+  user_db:
+    container_name: user_db
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/users:/data/db
+  users:
+    container_name: users
+    build: ./users
+    ports:
+      - 8080:8080
+    volumes:
+      - ./users/src:/users/src
+    environment:
+      - PORT=8080
+      - MONGO_URL=mongodb://user_db:27017/users
+    depends_on:
+      - user_db
