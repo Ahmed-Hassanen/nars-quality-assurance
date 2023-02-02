@@ -1,6 +1,7 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 
+
 const DB = process.env.MONGO_URL;
 
 mongoose.connect(DB).then(() => {
