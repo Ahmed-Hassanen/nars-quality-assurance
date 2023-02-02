@@ -100,7 +100,7 @@ studentSchema.methods.chagesPasswordAfter = function (JWTTimestamp) {
 };
 
 studentSchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetToken = crypto.randomBytes(3).toString("hex");
   this.passwordResetToken = crypto
     .createHash("sha256")
     .update(resetToken)
@@ -109,6 +109,6 @@ studentSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-const student = mongoose.model("User", studentSchema);
+const student = mongoose.model("Student", studentSchema);
 
 module.exports = student;

@@ -15,7 +15,13 @@ services:
     volumes:
       - ./users/src:/users/src
     environment:
+      - NODE_ENV=development
       - PORT=8080
       - MONGO_URL=mongodb://user_db:27017/users
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
