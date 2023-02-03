@@ -7,13 +7,7 @@ exports.getStudent = factory.getOne(Student);
 exports.getAllStudents = factory.getAll(Student);
 exports.updateStudent = factory.updateOne(Student);
 exports.deleteStudent = factory.deleteOne(Student);
-
-exports.createStudent = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not defined! Please use /signup instead",
-  });
-};
+exports.createStudent = factory.createOne(Student);
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
