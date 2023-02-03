@@ -1,12 +1,12 @@
-const path = require('path');
+const path = require("path");
 const express = require("express");
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const userRouter = require('./routes/userRoutes');
-const globalErrorHandler = require('./controllers/errorController');
+const helmet = require("helmet");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const userRouter = require("./routes/userRoutes");
+const globalErrorHandler = require("./controllers/errorController");
 const app = express();
-app.enable('trust proxy');
+app.enable("trust proxy");
 app.use(cookieParser());
 
 app.use(express.json());
@@ -16,14 +16,23 @@ app.use(
     extended: true,
   })
 );
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 }
 
-app.use('/api/v1/users', userRouter);
+app.use("/api/v1/users", userRouter);
 
+const router = express.Router();
 
-app.all('*', (req, res, next) => {
+router.get("/", (req, res, nex) => {
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+app.use("/test", router);
+
+app.all("*", (req, res, next) => {
   // const err = new Error(`can't find ${req.originalUrl} on this server `);
   // err.status = 'fail';
   // err.statusCode = 404;
@@ -32,6 +41,5 @@ app.all('*', (req, res, next) => {
 });
 
 app.use(globalErrorHandler);
-
 
 module.exports = app;

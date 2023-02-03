@@ -11,32 +11,69 @@ router.post("/verifyCode", authController.verifyCode);
 router.patch("/resetPassword", authController.resetPassword);
 
 //Student
-const studentsRouter = router.route("/students");
-studentsRouter
-  .route("/students")
-  .get(authController.protect, studentController.getAllStudents)
+router
+  .route("/students/")
+  .get(
+    // authController.protect,
+    studentController.getAllStudents
+  )
   .post(
-    authController.protect,
-    authController.restrictTo("system admin"),
+    // authController.protect,
+    // authController.restrictTo("system admin"),
     studentController.createStudent
   );
 
-studentsRouter
-  .get("/:id")
+router
+  .route("/students/:id")
   .get(authController.protect, studentController.getStudent)
   .patch(
-    authController.protect,
-    authController.restrictTo("system admin"),
+    // authController.protect,
+    // authController.restrictTo("system admin"),
     studentController.updateStudent
   )
   .delete(
-    authController.protect,
-    authController.restrictTo("system admin"),
+    // authController.protect,
+    // authController.restrictTo("system admin"),
     studentController.deleteStudent
   );
 
-studentsRouter
+router
   .route("/updateMe")
   .patch(authController.protect, studentController.updateMe);
+
+//Staff
+router
+  .route("/staff/")
+  .get(
+    // authController.protect,
+    staffController.getAllStaffMembers
+  )
+  .post(
+    // authController.protect,
+    // authController.restrictTo("system admin"),
+    staffController.createStaff
+  );
+
+router.route("/staff/get-certain-staff").get(
+  // authController.protect,
+  staffController.getCertainStaffMembers
+);
+
+router
+  .route("/staff/:id")
+  .get(
+    // authController.protect,
+    staffController.getStaff
+  )
+  .patch(
+    // authController.protect,
+    // authController.restrictTo("system admin"),
+    staffController.updateStaff
+  )
+  .delete(
+    // authController.protect,
+    // authController.restrictTo("system admin"),
+    staffController.deleteStaff
+  );
 
 module.exports = router;

@@ -6,6 +6,7 @@ const AppError = require("./../utils/appError");
 exports.getAllStaffMembers = factory.getAll(Staff);
 exports.deleteStaff = factory.deleteOne(Staff);
 exports.updateStaff = factory.updateOne(Staff);
+exports.getStaff = factory.getOne(Staff);
 exports.createStaff = factory.createOne(Staff);
 
 //finds all staff members to a certain role like get all instructors for example
