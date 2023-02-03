@@ -136,3 +136,85 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 200, req, res);
 });
+
+exports.signupWithEmail = catchAsync(async (req, res, next) => {
+  const user =
+    (await Staff.findOne({ email: req.body.email })) ||
+    (await Student.findOne({ email: req.body.email }));
+  if (!user)
+    return next(
+      new AppError(
+        `there is no user with this => ${req.body.email} email address`,
+        404
+      )
+    );
+
+  const verifyCode = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const message = `that email for verifing your account pls copy this code in verification page`;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "your verification code (Valid for 10m)",
+      message,
+      verifyCode,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "code sent to mail",
+    });
+  } catch (err) {
+    await user.save({ validateBeforeSave: false });
+    return next(
+      new AppError("there aws an error sending the email. try again later", 500)
+    );
+  }
+});
+exports.completeSignup = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.body.verifyCode)
+    .digest("hex");
+
+  const user =
+    (await Staff.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gte: Date.now() },
+    })) ||
+    (await Student.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gte: Date.now() },
+    }));
+
+  if (!user) {
+    return next(new AppError("code is invalid or has expired", 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save({ validateBeforeSave: false });
+
+  createSendToken(user, 200, req, res);
+});
+exports.login = catchAsync(async (req, res, next) => {
+  const userPassword = req.body.password;
+  const userEmail =
+    (await Staff.findOne({ email: req.body.email })) ||
+    (await Student.findOne({ email: req.body.email }));
+  if (!userEmail || !userPassword) {
+    return next(new AppError("Please provide email and password!", 400));
+  }
+  // 2) Check if user exists && password is correct
+  const user =
+    (await Staff.findOne({ email: req.body.email }).select("+password")) ||
+    (await Student.findOne({ email: req.body.email }).select("+password"));
+
+  if (!user || !(await user.correctPassword(userPassword, user.password))) {
+    return next(new AppError("Incorrect email or password", 401));
+  }
+
+  // 3) If everything ok, send token to client
+  createSendToken(user, 200, req, res);
+});
