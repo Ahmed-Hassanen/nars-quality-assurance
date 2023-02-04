@@ -6,9 +6,12 @@ const bcrypt = require("bcryptjs");
 const studentSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "User must have a name"],
+    required: [true, "student must have a name"],
   },
-  code: String,
+  code: {
+    type: String,
+    required: [true, "student must have a code"],
+  },
   password: {
     type: String,
     minlength: 8,
@@ -26,7 +29,7 @@ const studentSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   email: {
     type: String,
-    required: [true, "User must have an email"],
+    required: [true, "student must have an email"],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, "please provide a valid email"],

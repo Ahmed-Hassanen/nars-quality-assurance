@@ -44,13 +44,15 @@ router
 
 //Staff
 router
-  .route("/staff/")
+  .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
   .post(
     authController.protect,
     authController.restrictTo("system admin"),
     staffController.createStaff
   );
+
+router.route("/addSystemAdmin").post(staffController.createStaff);
 
 router
   .route("/staff/get-certain-staff")
