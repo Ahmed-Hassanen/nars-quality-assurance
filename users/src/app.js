@@ -22,16 +22,6 @@ if (process.env.NODE_ENV === "development") {
 
 app.use("/api/v1/users", userRouter);
 
-const router = express.Router();
-
-router.get("/", (req, res, nex) => {
-  res.status(200).json({
-    status: "success",
-  });
-});
-
-app.use("/test", router);
-
 app.all("*", (req, res, next) => {
   // const err = new Error(`can't find ${req.originalUrl} on this server `);
   // err.status = 'fail';
