@@ -4,11 +4,9 @@ const APIFeatures = require("../utils/apiFeatures");
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    console.log("calling delete");
     const doc = await Model.findByIdAndDelete(req.params.id);
 
     if (!doc) {
-      console.log("It is not found");
       return next(new AppError("No document found with that id", 404));
     }
 
@@ -54,8 +52,6 @@ exports.getOne = (Model, popOptions) =>
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 
-    console.log("Got the student with id of " + req.params.id);
-
     if (!doc) {
       return next(new AppError("No document found with that id", 404));
     }
@@ -73,7 +69,6 @@ exports.getAll = (Model) =>
     let filter = {};
     //filtering for the system adming
     if (req.params.role) filter = { role: req.params.role };
-    console.log("Filter is " + JSON.stringify(filter));
 
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()

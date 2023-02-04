@@ -52,7 +52,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const user =
     (await Staff.findOne({ email: req.body.email })) ||
     (await Student.findOne({ email: req.body.email }));
-  console.log(user);
   if (!user) {
     return next(new AppError("there is no user with email address", 404));
   }
@@ -201,7 +200,6 @@ exports.completeSignup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  console.log("hitting the login");
   const userPassword = req.body.password;
   const userEmail =
     (await Staff.findOne({ email: req.body.email })) ||
@@ -215,12 +213,7 @@ exports.login = catchAsync(async (req, res, next) => {
     (await Staff.findOne({ email: req.body.email }).select("+password")) ||
     (await Student.findOne({ email: req.body.email }).select("+password"));
 
-  console.log("about to check");
-  console.log("user password is " + userPassword);
-  console.log("passed password is " + user.password);
-
   if (!user || !(await user.correctPassword(userPassword, user.password))) {
-    console.log("incorrect email or passowrd");
     return next(new AppError("Incorrect email or password", 401));
   }
 
@@ -277,8 +270,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return async (req, res, next) => {
-    console.log("Role is " + req.user.role);
-    console.log("Current roles are " + roles);
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError("You do not have permission to perform this action", 403)
@@ -303,7 +294,6 @@ exports.restrictTo = (...roles) => {
 
     //check if this user is actually a staff member (to avoid students trying to get around this by passing a role)
     const decoded = await promisify(JWT.verify)(token, process.env.JWT_SECRET);
-    console.log(decoded.id);
     const staffUser = await Staff.findById(decoded.id);
     if (!staffUser || !roles.includes(staffUser.role)) {
       return next(

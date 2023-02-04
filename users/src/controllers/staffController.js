@@ -14,8 +14,6 @@ exports.getCertainStaffMembers = catchAsync(async (req, res, next) => {
   const staff = await Staff.find({
     role: req.body.role,
   });
-  console.log("Role is " + req.body.role);
-  console.log("Staff are " + JSON.stringify(staff));
 
   res.status(200).json({
     status: "success",

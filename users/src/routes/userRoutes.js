@@ -58,18 +58,15 @@ router
 
 router
   .route("/staff/:id")
-  .get(
-    // authController.protect,
-    staffController.getStaff
-  )
+  .get(authController.protect, staffController.getStaff)
   .patch(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     staffController.updateStaff
   )
   .delete(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     staffController.deleteStaff
   );
 
