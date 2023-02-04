@@ -1,17 +1,19 @@
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
-const APIFeatures = require('../utils/apiFeatures');
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
+const APIFeatures = require("../utils/apiFeatures");
 
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
+    console.log("calling delete");
     const doc = await Model.findByIdAndDelete(req.params.id);
 
     if (!doc) {
-      return next(new AppError('No document found with that id', 404));
+      console.log("It is not found");
+      return next(new AppError("No document found with that id", 404));
     }
 
     res.status(204).json({
-      status: 'success',
+      status: "success",
       data: null,
     });
   });
@@ -24,11 +26,11 @@ exports.updateOne = (Model) =>
     });
 
     if (!doc) {
-      return next(new AppError('No document found with that id', 404));
+      return next(new AppError("No document found with that id", 404));
     }
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: {
         data: doc,
       },
@@ -39,7 +41,7 @@ exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);
     res.status(201).json({
-      status: 'success',
+      status: "success",
       data: {
         data: doc,
       },
@@ -52,12 +54,14 @@ exports.getOne = (Model, popOptions) =>
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
 
+    console.log("Got the student with id of " + req.params.id);
+
     if (!doc) {
-      return next(new AppError('No document found with that id', 404));
+      return next(new AppError("No document found with that id", 404));
     }
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: {
         date: doc,
       },
@@ -67,7 +71,9 @@ exports.getOne = (Model, popOptions) =>
 exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     let filter = {};
-    if (req.params.tourId) filter = { tour: req.params.tourId };
+    //filtering for the system adming
+    if (req.params.role) filter = { role: req.params.role };
+    console.log("Filter is " + JSON.stringify(filter));
 
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()
@@ -77,7 +83,7 @@ exports.getAll = (Model) =>
     const doc = await features.query;
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       results: doc.length,
       data: {
         data: doc,

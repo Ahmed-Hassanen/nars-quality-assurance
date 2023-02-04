@@ -17,13 +17,10 @@ router.post("/login", authController.login);
 //Student
 router
   .route("/students/")
-  .get(
-    // authController.protect,
-    studentController.getAllStudents
-  )
+  .get(authController.protect, studentController.getAllStudents)
   .post(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     studentController.createStudent
   );
 
@@ -31,13 +28,13 @@ router
   .route("/students/:id")
   .get(authController.protect, studentController.getStudent)
   .patch(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     studentController.updateStudent
   )
   .delete(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     studentController.deleteStudent
   );
 
@@ -48,20 +45,16 @@ router
 //Staff
 router
   .route("/staff/")
-  .get(
-    // authController.protect,
-    staffController.getAllStaffMembers
-  )
+  .get(authController.protect, staffController.getAllStaffMembers)
   .post(
-    // authController.protect,
-    // authController.restrictTo("system admin"),
+    authController.protect,
+    authController.restrictTo("system admin"),
     staffController.createStaff
   );
 
-router.route("/staff/get-certain-staff").get(
-  // authController.protect,
-  staffController.getCertainStaffMembers
-);
+router
+  .route("/staff/get-certain-staff")
+  .get(authController.protect, staffController.getCertainStaffMembers);
 
 router
   .route("/staff/:id")
