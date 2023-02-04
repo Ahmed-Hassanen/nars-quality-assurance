@@ -52,21 +52,20 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const user =
     (await Staff.findOne({ email: req.body.email })) ||
     (await Student.findOne({ email: req.body.email }));
-  console.log(user);
   if (!user) {
     return next(new AppError("there is no user with email address", 404));
   }
 
-  const verifyCode = user.createPasswordResetToken();
+  const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const message = `forgot your Password? your reset password code is`;
+  const message = `forgot your Password? your reset password code is 
+  ${resetToken}`;
   try {
     await sendEmail({
       email: user.email,
-      subject: "your password reset code (Valid for 10m)",
+      subject: "your password reset token (Valid for 10m)",
       message,
-      verifyCode,
     });
 
     res.status(200).json({
@@ -79,7 +78,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     return next(
-      new AppError("there was an error sending the email. try again later", 500)
+      new AppError("there aws an error sending the email. try again later", 500)
     );
   }
 });
@@ -172,6 +171,7 @@ exports.signupWithEmail = catchAsync(async (req, res, next) => {
     );
   }
 });
+
 exports.completeSignup = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
@@ -198,11 +198,13 @@ exports.completeSignup = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 200, req, res);
 });
+
 exports.login = catchAsync(async (req, res, next) => {
   const userPassword = req.body.password;
   const userEmail =
     (await Staff.findOne({ email: req.body.email })) ||
     (await Student.findOne({ email: req.body.email }));
+
   if (!userEmail || !userPassword) {
     return next(new AppError("Please provide email and password!", 400));
   }
@@ -218,3 +220,87 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Getting token and check of it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access.", 401)
+    );
+  }
+
+  // 2) Verification token
+  const decoded = await promisify(JWT.verify)(token, process.env.JWT_SECRET);
+
+  // 3) Check if user still exists
+  const staffUser = await Staff.findById(decoded.id);
+  const studentUser = await Student.findById(decoded.id);
+  if (!staffUser && !studentUser) {
+    return next(
+      new AppError(
+        "The user belonging to this token does no longer exist.",
+        401
+      )
+    );
+  }
+  const currentUser = staffUser ? staffUser : studentUser;
+
+  // 4) Check if user changed password after the token was issued
+  if (currentUser.chagesPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! Please log in again.", 401)
+    );
+  }
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+  res.locals.user = currentUser;
+  next();
+});
+
+exports.restrictTo = (...roles) => {
+  return async (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+
+    if (!token) {
+      return next(
+        new AppError("You are not logged in! Please log in to get access.", 401)
+      );
+    }
+
+    //check if this user is actually a staff member (to avoid students trying to get around this by passing a role)
+    const decoded = await promisify(JWT.verify)(token, process.env.JWT_SECRET);
+    const staffUser = await Staff.findById(decoded.id);
+    if (!staffUser || !roles.includes(staffUser.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+
+    next();
+  };
+};
