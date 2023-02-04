@@ -2,7 +2,7 @@ version: "3"
 services:
   user_db:
     container_name: user_db
-    image: mongo
+    image: mohamedsalama118/mongo
     ports:
       - 27017:27017
     volumes:
@@ -10,6 +10,7 @@ services:
   users:
     container_name: users
     build: ./users
+    image: mohamedsalama118/users
     ports:
       - 8080:8080
     volumes:

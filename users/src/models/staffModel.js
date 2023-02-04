@@ -12,12 +12,10 @@ const staffSchema = new mongoose.Schema({
   password: {
     type: String,
     minlength: 8,
-    required: [true, "User must have a password"],
     select: false,
   },
   passwordConfirm: {
     type: String,
-    required: [true, "please confirm your password"],
     validate: {
       validator: function (el) {
         return el === this.password;

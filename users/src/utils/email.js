@@ -8,11 +8,12 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
+  const html = `<h3 style="text-align: left; color:black;">${options.message}</h3><h1 style="color:red; text-align: center; color:red;">${options.verifyCode}</h1>`;
   const mailOptions = {
     from: process.env.EMAIL,
     to: options.email,
     subject: options.subject,
-    text: options.message,
+    html,
   };
   await transporter.sendMail(mailOptions);
 };
