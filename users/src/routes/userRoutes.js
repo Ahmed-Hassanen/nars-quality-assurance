@@ -39,6 +39,10 @@ router
   );
 
 router
+  .route("/search-student")
+  .get(authController.protect, studentController.getStudentByCode);
+
+router
   .route("/updateMe")
   .patch(authController.protect, studentController.updateMe);
 
@@ -71,5 +75,9 @@ router
     authController.restrictTo("system admin"),
     staffController.deleteStaff
   );
+
+router
+  .route("/search-staff-member")
+  .get(authController.protect, staffController.getStaffMemberByEmail);
 
 module.exports = router;

@@ -21,3 +21,21 @@ exports.getCertainStaffMembers = catchAsync(async (req, res, next) => {
     data: staff,
   });
 });
+
+//TODO make the email as an index
+exports.getStaffMemberByEmail = catchAsync(async (req, res, next) => {
+  const email = req.body.email;
+  if (!email) {
+    return next(new AppError("You should insert an email", 401));
+  }
+  let doc = await Staff.find({ email });
+
+  if (!doc) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: doc,
+  });
+});
