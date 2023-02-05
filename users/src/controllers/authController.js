@@ -56,16 +56,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     return next(new AppError("there is no user with email address", 404));
   }
 
-  const resetToken = user.createPasswordResetToken();
+  const verifyCode = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const message = `forgot your Password? your reset password code is 
-  ${resetToken}`;
+  const message = `forgot your Password? your reset password code is `;
   try {
     await sendEmail({
       email: user.email,
       subject: "your password reset token (Valid for 10m)",
       message,
+      verifyCode,
     });
 
     res.status(200).json({
