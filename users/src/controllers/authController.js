@@ -86,7 +86,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.verifyCode = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
-    .update(req.body.resetCode)
+    .update(req.body.verifyCode)
     .digest("hex");
 
   const user =
@@ -107,10 +107,11 @@ exports.verifyCode = catchAsync(async (req, res, next) => {
   });
 });
 
+
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
-    .update(req.body.resetCode)
+    .update(req.body.verifyCode)
     .digest("hex");
 
   const user =
@@ -138,8 +139,8 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.signupWithEmail = catchAsync(async (req, res, next) => {
   const user =
-    (await Staff.findOne({ email: req.body.email })) ||
-    (await Student.findOne({ email: req.body.email }));
+    (await Staff.findOne({ email: req.body.email }).select('+password')) ||
+    (await Student.findOne({ email: req.body.email }).select('+password'));
   if (!user)
     return next(
       new AppError(
@@ -147,7 +148,10 @@ exports.signupWithEmail = catchAsync(async (req, res, next) => {
         404
       )
     );
-
+    console.log(user);
+  if(user.password){
+    return next(new AppError(`that email already signup`,404));
+  }
   const verifyCode = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
