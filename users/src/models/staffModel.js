@@ -49,6 +49,7 @@ const staffSchema = new mongoose.Schema({
       "department admin",
     ],
   },
+  
   passwordResetToken: String,
   passwordResetExpires: Date,
 
