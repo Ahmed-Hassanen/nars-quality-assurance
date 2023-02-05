@@ -47,21 +47,3 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: updatedUser,
   });
 });
-
-//TODO make the code as an index
-exports.getStudentByCode = catchAsync(async (req, res, next) => {
-  const code = req.body.code;
-  if (!code) {
-    return next(new AppError("You should insert a code", 401));
-  }
-  let doc = await Student.find({ code });
-
-  if (!doc) {
-    return next(new AppError("No document found with that id", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: doc,
-  });
-});

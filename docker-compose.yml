@@ -12,7 +12,7 @@ services:
     build: ./users
     image: mohamedsalama118/users
     ports:
-      - 80:8080
+      - 8081:8080
     volumes:
       - ./users/src:/users/src
     environment:
@@ -26,3 +26,10 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
+  nginx:
+    build: ./nginx
+    container_name: ms_nginx
+    depends_on:
+      - users
+    ports:
+      - 80:80
