@@ -29,6 +29,7 @@ services:
   nginx:
     build: ./nginx
     container_name: ms_nginx
+    image: mohamedsalama118/nars-quality-assurance-nginx
     depends_on:
       - users
     ports:
