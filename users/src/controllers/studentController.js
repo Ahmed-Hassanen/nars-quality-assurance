@@ -1,7 +1,7 @@
 const Student = require("../models/studentModel");
-const factory = require("./handlerFactory");
-const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/appError");
+const factory = require("./../shared/controllers/handlerFactory");
+const catchAsync = require("./../shared/utils/catchAsync");
+const AppError = require("./../shared/utils/appError");
 
 exports.getStudent = factory.getOne(Student);
 exports.getAllStudents = factory.getAll(Student);

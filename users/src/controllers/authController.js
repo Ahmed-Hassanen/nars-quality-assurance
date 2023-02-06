@@ -3,9 +3,9 @@ const { promisify } = require("util");
 const JWT = require("jsonwebtoken");
 const Student = require("../models/studentModel");
 const Staff = require("../models/staffModel");
-const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
-const sendEmail = require("../utils/email");
+const catchAsync = require("../shared/utils/catchAsync");
+const AppError = require("../shared/utils/appError");
+const sendEmail = require("../shared/utils/email");
 
 const signToken = (id) => {
   return JWT.sign({ id }, process.env.JWT_SECRET, {
@@ -107,7 +107,6 @@ exports.verifyCode = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
@@ -139,8 +138,8 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.signupWithEmail = catchAsync(async (req, res, next) => {
   const user =
-    (await Staff.findOne({ email: req.body.email }).select('+password')) ||
-    (await Student.findOne({ email: req.body.email }).select('+password'));
+    (await Staff.findOne({ email: req.body.email }).select("+password")) ||
+    (await Student.findOne({ email: req.body.email }).select("+password"));
   if (!user)
     return next(
       new AppError(
@@ -148,9 +147,9 @@ exports.signupWithEmail = catchAsync(async (req, res, next) => {
         404
       )
     );
-    console.log(user);
-  if(user.password){
-    return next(new AppError(`that email already signup`,404));
+  console.log(user);
+  if (user.password) {
+    return next(new AppError(`that email already signup`, 404));
   }
   const verifyCode = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
