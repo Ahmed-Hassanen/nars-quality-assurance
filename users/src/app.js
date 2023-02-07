@@ -2,10 +2,10 @@ const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const AppError = require("./utils/appError");
+const AppError = require("./shared/utils/appError");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRoutes");
-const globalErrorHandler = require("./controllers/errorController");
+const globalErrorHandler = require("./shared/controllers/errorController");
 const cors = require("cors");
 
 const app = express();
