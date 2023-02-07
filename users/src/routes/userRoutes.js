@@ -72,4 +72,7 @@ router
     staffController.deleteStaff
   );
 
+router.route("/is-protected").get(authController.protect);
+route.route("/is-restricted").get(authController.restrictTo);
+
 module.exports = router;
