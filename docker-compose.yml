@@ -28,10 +28,73 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
+
+  faculty_db:
+    container_name: faculty_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27020:27017
+    volumes:
+      - ./data/faculty:/data/db
+
+  faculty:
+    container_name: faculty
+    build: ./faculty
+    image: mohamedsalama118/faculty
+    ports:
+      - 8083:8080
+    volumes:
+      - ./faculty/src:/faculty/src
+      - ./shared/utils:/faculty/src/shared/utils
+      - ./shared/controllers:/faculty/src/shared/controllers
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://faculty_db:27017/faculty
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - faculty_db
+
+  department_db:
+    container_name: department_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27021:27017
+    volumes:
+      - ./data/department:/data/db
+
+  department:
+    container_name: department
+    build: ./department
+    image: mohamedsalama118/department
+    ports:
+      - 8084:8080
+    volumes:
+      - ./department/src:/department/src
+      - ./shared/utils:/department/src/shared/utils
+      - ./shared/controllers:/department/src/shared/controllers
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://department_db:27017/department
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - department_db
+
   nginx:
     build: ./nginx
     container_name: ms_nginx
     depends_on:
       - users
+      - department
+      - faculty
     ports:
       - 80:80
