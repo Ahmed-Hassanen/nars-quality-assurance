@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const Question = require("./questionModel");
-const validator = require("validator");
 
 const surveySchema = new mongoose.Schema({
   name: {
@@ -9,7 +7,18 @@ const surveySchema = new mongoose.Schema({
   },
   description: String,
   questions: {
-    type: [Question],
+    type: [
+      {
+        question: {
+          type: String,
+          required: [true, "Question must have a question"],
+        },
+        possibleAnswers: {
+          type: [String],
+          require: [true, "Question must have answers"],
+        },
+      },
+    ],
     required: [true, "Survey must have questions"],
   },
   courseId: mongoose.Schema.ObjectId,

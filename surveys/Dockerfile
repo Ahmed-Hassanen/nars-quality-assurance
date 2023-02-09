@@ -1,6 +1,6 @@
 FROM node
 
-WORKDIR /users
+WORKDIR /surveys
 
 COPY package*.json ./
 

@@ -24,6 +24,7 @@ services:
       - ./users/src:/users/src
       - ./shared/utils:/users/src/shared/utils
       - ./shared/controllers:/users/src/shared/controllers
+      - ./shared/middlewares:/users/src/shared/middlewares
     environment:
       - NODE_ENV=development
       - PORT=8080
@@ -43,10 +44,13 @@ services:
       - 8082:8080
     volumes:
       - ./surveys/src:/surveys/src
+      - ./shared/utils:/surveys/src/shared/utils
+      - ./shared/controllers:/surveys/src/shared/controllers
+      - ./shared/middlewares:/surveys/src/shared/middlewares
     environment:
       - NODE_ENV=development
       - PORT=8080
-      - MONGO_URL=mongodb://user_db:27017/surveys
+      - MONGO_URL=mongodb://survey_db:27017/surveys
       - EMAIL=nars-qa@outlook.com
       - EMAIL_PASSWORD=NARSsystem
       - EXPIRES_IN=90d

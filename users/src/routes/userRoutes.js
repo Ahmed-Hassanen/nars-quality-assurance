@@ -14,7 +14,6 @@ router.post("/signup", authController.signupWithEmail);
 router.post("/completeSignup", authController.completeSignup);
 router.post("/login", authController.login);
 
-//Student
 router
   .route("/students/")
   .get(authController.protect, studentController.getAllStudents)
@@ -72,7 +71,7 @@ router
     staffController.deleteStaff
   );
 
-router.route("/is-protected").get(authController.protect);
-route.route("/is-restricted").get(authController.restrictTo);
+router.route("/is-protected").post(authController.protectRequest);
+router.route("/is-restricted").post(authController.restrictRequest);
 
 module.exports = router;

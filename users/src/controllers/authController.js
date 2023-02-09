@@ -307,3 +307,50 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.protectRequest = catchAsync(async (req, res, next) => {
+  const id = req.body.id;
+
+  // 3) Check if user still exists
+  const staffUser = await Staff.findById(id);
+  const studentUser = await Student.findById(id);
+  if (!staffUser && !studentUser) {
+    res.status(200).json({
+      status: false,
+      message: "The user belonging to this token does no longer exist",
+      code: 401,
+    });
+  }
+  const currentUser = staffUser ? staffUser : studentUser;
+
+  res.status(200).json({
+    status: true,
+    user: currentUser,
+  });
+});
+
+exports.restrictRequest = catchAsync(async (req, res, next) => {
+  console.log("roles are " + req.body.roles);
+  const id = req.body.id;
+  const roles = req.body.roles;
+  const userRole = req.body.userRole;
+  if (!roles.includes(userRole)) {
+    res.status(200).json({
+      status: false,
+      message: "You do not have permission to perform this action",
+      code: 403,
+    });
+  }
+
+  const staffUser = await Staff.findById(id);
+  if (!staffUser || !roles.includes(staffUser.role)) {
+    res.status(200).json({
+      status: false,
+      message: "You do not have permission to perform this action",
+      code: 403,
+    });
+  }
+  res.status(200).json({
+    status: true,
+  });
+});
