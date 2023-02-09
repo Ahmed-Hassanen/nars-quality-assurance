@@ -7,6 +7,13 @@ services:
       - 27017:27017
     volumes:
       - ./data/users:/data/db
+  survey_db:
+    container_name: survey_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/survey:/data/db      
   users:
     container_name: users
     build: ./users
@@ -17,6 +24,7 @@ services:
       - ./users/src:/users/src
       - ./shared/utils:/users/src/shared/utils
       - ./shared/controllers:/users/src/shared/controllers
+      - ./shared/middlewares:/users/src/shared/middlewares
     environment:
       - NODE_ENV=development
       - PORT=8080
@@ -28,6 +36,28 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
+  surveys:
+    container_name: surveys
+    build: ./surveys
+    image: mohamedsalama118/surveys
+    ports:
+      - 8082:8080
+    volumes:
+      - ./surveys/src:/surveys/src
+      - ./shared/utils:/surveys/src/shared/utils
+      - ./shared/controllers:/surveys/src/shared/controllers
+      - ./shared/middlewares:/surveys/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://survey_db:27017/surveys
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - survey_db
   nginx:
     build: ./nginx
     container_name: ms_nginx
