@@ -118,6 +118,6 @@ services:
       - users
       - department
       - faculty
-      - survey
+      - surveys
     ports:
       - 80:80
