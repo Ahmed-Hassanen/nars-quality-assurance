@@ -48,15 +48,15 @@ const studentSchema = new mongoose.Schema({
     select: false,
   },
 
-  about: {
-    type: String,
-  },
   courses: [String],
   passedCourses: [String],
   program: String,
   faculty: String,
   department: String,
-  academicYear: String,
+  academicYear: {
+    type: String,
+    required: [true, "student must belong to academic year"],
+                },
   role: String,
 });
 
