@@ -18,6 +18,14 @@ router
   );
 
 router
+  .route("/updateCompetences/:id")
+  .patch(
+    protect,
+    restrictTo("department admin"),
+    departmentController.updateCompetences,
+    departmentController.getDepartment
+  );
+router
   .route("/:id")
   .get(
     protect,

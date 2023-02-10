@@ -15,6 +15,15 @@ router
     restrictTo("faculty admin", "department admin"),
     facultyController.getFacultySummary
   );
+
+router
+  .route("/updateCompetences/:id")
+  .patch(
+    protect,
+    restrictTo("faculty admin"),
+    facultyController.updateCompetences,
+    facultyController.getFaculty
+  );
 router
   .route("/:id")
   .get(protect, restrictTo("faculty admin"), facultyController.getFaculty)
