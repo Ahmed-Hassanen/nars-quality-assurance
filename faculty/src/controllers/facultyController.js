@@ -89,7 +89,10 @@ exports.getFaculty = catchAsync(async (req, res, next) => {
   }
   doc.competences = [];
   competences_description.data.forEach((competence) => {
-    doc.competences.push(competence.description);
+    const obj = {};
+    obj.code = competence.code;
+    obj.description = competence.description;
+    doc.competences.push(obj);
   });
   console.log(doc.competences);
   //console.log(doc.departments);

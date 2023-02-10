@@ -79,7 +79,10 @@ exports.getDepartment = catchAsync(async (req, res, next) => {
   }
   doc.competences = [];
   competences_description.data.forEach((competence) => {
-    doc.competences.push(competence.description);
+    const obj = {};
+    obj.code = competence.code;
+    obj.description = competence.description;
+    doc.competences.push(obj);
   });
   //console.log(faculty.data);
   doc.faculty = faculty.data.name;
