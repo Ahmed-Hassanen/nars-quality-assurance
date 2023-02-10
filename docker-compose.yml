@@ -7,6 +7,13 @@ services:
       - 27017:27017
     volumes:
       - ./data/users:/data/db
+  competences_db:
+    container_name: competences_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27019:27017
+    volumes:
+      - ./data/competences:/data/db    
   users:
     container_name: users
     build: ./users
@@ -28,6 +35,27 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
+  competences:
+    container_name: competences
+    build: ./competences
+    image: mohamedsalama118/competences
+    ports:
+      - 8083:8080
+    volumes:
+      - ./competences/src:/competences/src
+      - ./shared/utils:/competences/src/shared/utils
+      - ./shared/controllers:/competences/src/shared/controllers
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://competences_db:27017/competences
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - competences_db    
   nginx:
     build: ./nginx
     container_name: ms_nginx
