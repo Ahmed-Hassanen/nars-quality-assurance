@@ -21,6 +21,7 @@ const facultySchema = new mongoose.Schema({
     type: [String],
     required: [true, "department must have academic years"],
   },
+  departments: [String],
 });
 
 const faculty = mongoose.model("Faculty", facultySchema);

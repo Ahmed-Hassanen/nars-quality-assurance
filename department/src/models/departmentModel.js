@@ -21,10 +21,6 @@ const departmentSchema = new mongoose.Schema({
     type: String,
     required: [true, "department must belong to faculty"],
   },
-  programs: {
-    type: [String],
-  },
-
   vision: {
     type: String,
   },
