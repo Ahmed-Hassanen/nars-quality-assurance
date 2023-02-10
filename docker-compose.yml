@@ -13,7 +13,7 @@ services:
     ports:
       - 27018:27017
     volumes:
-      - ./data/survey:/data/db      
+      - ./data/survey:/data/db
   users:
     container_name: users
     build: ./users
@@ -36,7 +36,7 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
-      
+
   faculty_db:
     container_name: faculty_db
     image: mohamedsalama118/mongo
@@ -54,6 +54,7 @@ services:
       - ./faculty/src:/faculty/src
       - ./shared/utils:/faculty/src/shared/utils
       - ./shared/controllers:/faculty/src/shared/controllers
+      - ./shared/middlewares:/faculty/src/shared/middlewares
     environment:
       - NODE_ENV=development
       - PORT=8080
@@ -84,10 +85,16 @@ services:
       - ./department/src:/department/src
       - ./shared/utils:/department/src/shared/utils
       - ./shared/controllers:/department/src/shared/controllers
+      - ./shared/middlewares:/department/src/shared/middlewares
     environment:
       - NODE_ENV=development
       - PORT=8080
       - MONGO_URL=mongodb://department_db:27017/department
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
 
   surveys:
     container_name: surveys
