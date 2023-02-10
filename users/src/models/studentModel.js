@@ -57,6 +57,7 @@ const studentSchema = new mongoose.Schema({
   faculty: String,
   department: String,
   academicYear: String,
+  role: String,
 });
 
 studentSchema.pre("save", async function (next) {
