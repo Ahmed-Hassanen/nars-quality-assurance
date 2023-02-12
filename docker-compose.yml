@@ -14,7 +14,13 @@ services:
       - 27019:27017
     volumes:
       - ./data/competences:/data/db
-
+  courses_db:
+    container_name: courses_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27024:27017
+    volumes:
+      - ./data/courses:/data/db
   survey_db:
     container_name: survey_db
     image: mohamedsalama118/mongo
@@ -147,6 +153,28 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - survey_db
+  courses:
+    container_name: courses
+    build: ./courses
+    image: mohamedsalama118/courses
+    ports:
+      - 8087:8080
+    volumes:
+      - ./courses/src:/courses/src
+      - ./shared/utils:/courses/src/shared/utils
+      - ./shared/controllers:/courses/src/shared/controllers
+      - ./shared/middlewares:/courses/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://survey_db:27017/courses
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - courses_db
   nginx:
     build: ./nginx
     container_name: ms_nginx
@@ -155,5 +183,6 @@ services:
       - department
       - faculty
       - surveys
+      - courses
     ports:
       - 80:80
