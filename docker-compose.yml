@@ -22,6 +22,13 @@ services:
       - 27018:27017
     volumes:
       - ./data/survey:/data/db
+  program_db:
+    container_name: program_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27022:27017
+    volumes:
+      - ./data/programs:/data/db    
   users:
     container_name: users
     build: ./users
@@ -65,6 +72,29 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - faculty_db
+
+  programs:
+    container_name: programs
+    build: ./programs
+    image: mohamedsalama118/programs
+    ports:
+      - 8086:8080
+    volumes:
+      - ./programs/src:/programs/src
+      - ./shared/utils:/programs/src/shared/utils
+      - ./shared/controllers:/programs/src/shared/controllers
+      - ./shared/middlewares:/programs/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://program_db:27017/programs
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - program_db    
 
   faculty_db:
     container_name: faculty_db
