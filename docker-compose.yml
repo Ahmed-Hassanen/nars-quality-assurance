@@ -167,7 +167,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=8080
-      - MONGO_URL=mongodb://survey_db:27017/courses
+      - MONGO_URL=mongodb://courses_db:27017/courses
       - EMAIL=nars-qa@outlook.com
       - EMAIL_PASSWORD=NARSsystem
       - EXPIRES_IN=90d
