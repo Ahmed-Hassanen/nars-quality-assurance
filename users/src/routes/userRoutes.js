@@ -62,13 +62,21 @@ router
   .get(authController.protect, staffController.getStaff)
   .patch(
     authController.protect,
-    authController.restrictTo("system admin"),
+    authController.restrictTo("system admin", "instructor"),
     staffController.updateStaff
   )
   .delete(
     authController.protect,
     authController.restrictTo("system admin"),
     staffController.deleteStaff
+  );
+
+router
+  .route("/update-staff-courses/:id")
+  .post(
+    authController.protect,
+    authController.restrictTo("system admin", "instructor"),
+    staffController.updateStaffCourses
   );
 
 router.route("/is-protected").post(authController.protectRequest);

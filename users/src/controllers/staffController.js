@@ -21,3 +21,32 @@ exports.getCertainStaffMembers = catchAsync(async (req, res, next) => {
     data: staff,
   });
 });
+
+exports.updateStaffCourses = catchAsync(async (req, res, next) => {
+  const course = req.body.courseId;
+
+  const updatedStaff = await Staff.findByIdAndUpdate(
+    req.params.id,
+    {
+      $push: { courses: course },
+    },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!updatedStaff) {
+    res.json({
+      status: false,
+      message: "Staff member is not found",
+      code: 403,
+    });
+  } else {
+    res.json({
+      status: true,
+      message: "Staff member is updated",
+      code: 201,
+    });
+  }
+});

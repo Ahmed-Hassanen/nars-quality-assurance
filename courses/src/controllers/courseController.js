@@ -17,6 +17,8 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
     return next(new AppError("No document found with that id", 404));
   }
   const header = `authorization: Bearer ${req.cookies.jwt}`;
+  console.log("Program is " + orignalCourse.program);
+  console.log("Year is " + orignalCourse.academicYear);
   const studentsData = await axios
     .get(
       `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`,
@@ -104,8 +106,30 @@ exports.assignCourseConstructor = catchAsync(async (req, res, next) => {
     }
   );
 
-  res.status(201).json({
-    status: "success",
-    data: doc,
-  });
+  //update staff user to contain this course as well
+  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  const staffData = await axios
+    .patch(`http://users:8080/staff/update-staff-courses/${instructorId}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+
+  if (staffData.status) {
+    res.status(201).json({
+      status: "success",
+      data: doc,
+    });
+  } else {
+    res.status(staffData.code).json({
+      status: false,
+      message: staffData.message,
+    });
+  }
 });
