@@ -43,11 +43,10 @@ const courseInstanceSchema = new mongoose.Schema({
       },
     ],
   },
-
   exams: [mongoose.Schema.ObjectId],
   students: [mongoose.Schema.ObjectId],
   assignments: [mongoose.Schema.ObjectId],
-  instructor: String,
+  instructor: mongoose.Schema.ObjectId,
   teachingAssistant: mongoose.Schema.ObjectId,
   courseSpecs: {
     courseData: {
@@ -65,7 +64,7 @@ const courseInstanceSchema = new mongoose.Schema({
           {
             code: String,
             description: String,
-            mappedCompetence: String, //Competence Code
+            mappedCompetence: [String], //Competence Code
             learningTeachingMethods: [
               {
                 type: String,

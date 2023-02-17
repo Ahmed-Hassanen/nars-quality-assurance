@@ -32,7 +32,6 @@ services:
       - 27019:27017
     volumes:
       - ./data/competences:/data/db
-
   courses_db:
     container_name: courses_db
     image: mohamedsalama118/mongo
