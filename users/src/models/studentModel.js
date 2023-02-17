@@ -50,7 +50,7 @@ const studentSchema = new mongoose.Schema({
 
   courses: [mongoose.Schema.ObjectId],
   passedCourses: [mongoose.Schema.ObjectId],
-  program: mongoose.Schema.ObjectId,
+  program: String,
   faculty: mongoose.Schema.ObjectId,
   department: mongoose.Schema.ObjectId,
   academicYear: {

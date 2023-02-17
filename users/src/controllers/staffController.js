@@ -2,6 +2,13 @@ const Staff = require("../models/staffModel");
 const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
+const { Kafka } = require("kafkajs");
+
+const kafka = new Kafka({
+  clientId: "my-app",
+  brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
+});
+const consumer = kafka.consumer({ groupId: "group-1" });
 
 exports.getAllStaffMembers = factory.getAll(Staff);
 exports.deleteStaff = factory.deleteOne(Staff);
@@ -24,11 +31,15 @@ exports.getCertainStaffMembers = catchAsync(async (req, res, next) => {
 
 exports.updateStaffCourses = catchAsync(async (req, res, next) => {
   const course = req.body.courseId;
+  const instructor = req.body.instructorId;
+  console.log("HHHHHHHHHHHHHHHHHHHHHHelleo over here " + course);
 
-  const updatedStaff = await Staff.findByIdAndUpdate(
-    req.params.id,
+  var updatedStaff = await Staff.findByIdAndUpdate(
+    instructor,
     {
-      $push: { courses: course },
+      $addToSet: {
+        courses: course,
+      },
     },
     {
       new: true, //return updated document
@@ -47,6 +58,23 @@ exports.updateStaffCourses = catchAsync(async (req, res, next) => {
       status: true,
       message: "Staff member is updated",
       code: 201,
+      staff: updatedStaff,
     });
   }
 });
+
+updateCourseInstructorConsumer = async () => {
+  await consumer.connect();
+  await consumer.subscribe({
+    topic: process.env.KAFKA_ASSIGN_COURSE_TOPIC,
+    fromBeginning: true,
+  });
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      const data = JSON.parse(message);
+      this.updateStaffCourses();
+    },
+  });
+};
+
+updateCourseInstructorConsumer().catch(console.log);

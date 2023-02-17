@@ -58,6 +58,14 @@ router
   .get(authController.protect, staffController.getCertainStaffMembers);
 
 router
+  .route("/staff/update-staff-courses")
+  .patch(
+    authController.protect,
+    authController.restrictTo("system admin", "instructor"),
+    staffController.updateStaffCourses
+  );
+
+router
   .route("/staff/:id")
   .get(authController.protect, staffController.getStaff)
   .patch(
@@ -69,14 +77,6 @@ router
     authController.protect,
     authController.restrictTo("system admin"),
     staffController.deleteStaff
-  );
-
-router
-  .route("/update-staff-courses/:id")
-  .post(
-    authController.protect,
-    authController.restrictTo("system admin", "instructor"),
-    staffController.updateStaffCourses
   );
 
 router.route("/is-protected").post(authController.protectRequest);

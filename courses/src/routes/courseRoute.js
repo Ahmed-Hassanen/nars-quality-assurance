@@ -30,7 +30,11 @@ router
   .patch(protect, courseController.updateCourseInstance);
 
 router
-  .route("/assign-course-instructor/:id")
-  .patch(courseController.assignCourseConstructor);
+  .route("/assign-course-instructor")
+  .patch(
+    protect,
+    restrictTo("system admin"),
+    courseController.assignCourseInstructor
+  );
 
 module.exports = router;
