@@ -17,6 +17,7 @@ const courseSchema = new mongoose.Schema({
   },
   program: mongoose.Schema.ObjectId,
   department: mongoose.Schema.ObjectId,
+  faculty: mongoose.Schema.ObjectId,
   competences: [mongoose.Schema.ObjectId],
   exams: [mongoose.Schema.ObjectId],
   fullMark: {

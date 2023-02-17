@@ -6,11 +6,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(
-    protect,
-    restrictTo("department admin", "faculty admin"),
-    departmentController.getAllDepartments
-  )
+  .get(departmentController.getAllDepartments)
   .post(
     protect,
     restrictTo("department admin"),
