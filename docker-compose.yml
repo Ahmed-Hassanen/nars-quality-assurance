@@ -14,27 +14,27 @@ services:
   #     - 27019:27017
   #   volumes:
   #     - ./data/competences:/data/db
-  # courses_db:
-  #   container_name: courses_db
-  #   image: mohamedsalama118/mongo
-  #   ports:
-  #     - 27024:27017
-  #   volumes:
-  #     - ./data/courses:/data/db
-  # survey_db:
-  #   container_name: survey_db
-  #   image: mohamedsalama118/mongo
-  #   ports:
-  #     - 27018:27017
-  #   volumes:
-  #     - ./data/survey:/data/db
-  # program_db:
-  #   container_name: program_db
-  #   image: mohamedsalama118/mongo
-  #   ports:
-  #     - 27022:27017
-  #   volumes:
-  #     - ./data/programs:/data/db    
+  courses_db:
+    container_name: courses_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27024:27017
+    volumes:
+      - ./data/courses:/data/db
+  survey_db:
+    container_name: survey_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/survey:/data/db
+  program_db:
+    container_name: program_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27022:27017
+    volumes:
+      - ./data/programs:/data/db
   users:
     container_name: users
     build: ./users
@@ -79,140 +79,141 @@ services:
   #   depends_on:
   #     - faculty_db
 
-  # programs:
-  #   container_name: programs
-  #   build: ./programs
-  #   image: mohamedsalama118/programs
-  #   ports:
-  #     - 8086:8080
-  #   volumes:
-  #     - ./programs/src:/programs/src
-  #     - ./shared/utils:/programs/src/shared/utils
-  #     - ./shared/controllers:/programs/src/shared/controllers
-  #     - ./shared/middlewares:/programs/src/shared/middlewares
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=8080
-  #     - MONGO_URL=mongodb://program_db:27017/programs
-  #     - EMAIL=nars-qa@outlook.com
-  #     - EMAIL_PASSWORD=NARSsystem
-  #     - EXPIRES_IN=90d
-  #     - JWT_COOKIE_EXPIRES_IN=90
-  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
-  #   depends_on:
-  #     - program_db    
+  programs:
+    container_name: programs
+    build: ./programs
+    image: mohamedsalama118/programs
+    ports:
+      - 8086:8080
+    volumes:
+      - ./programs/src:/programs/src
+      - ./shared/utils:/programs/src/shared/utils
+      - ./shared/controllers:/programs/src/shared/controllers
+      - ./shared/middlewares:/programs/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://program_db:27017/programs
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - program_db
 
-  # faculty_db:
-  #   container_name: faculty_db
-  #   image: mohamedsalama118/mongo
-  #   ports:
-  #     - 27020:27017
-  #   volumes:
-  #     - ./data/faculty:/data/db
-  # faculty:
-  #   container_name: faculty
-  #   build: ./faculty
-  #   image: mohamedsalama118/faculty
-  #   ports:
-  #     - 8083:8080
-  #   volumes:
-  #     - ./faculty/src:/faculty/src
-  #     - ./shared/utils:/faculty/src/shared/utils
-  #     - ./shared/controllers:/faculty/src/shared/controllers
-  #     - ./shared/middlewares:/faculty/src/shared/middlewares
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=8080
-  #     - MONGO_URL=mongodb://faculty_db:27017/faculty
-  #     - EMAIL=nars-qa@outlook.com
-  #     - EMAIL_PASSWORD=NARSsystem
-  #     - EXPIRES_IN=90d
-  #     - JWT_COOKIE_EXPIRES_IN=90
-  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
-  #   depends_on:
-  #     - faculty_db
+  faculty_db:
+    container_name: faculty_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27020:27017
+    volumes:
+      - ./data/faculty:/data/db
+  faculty:
+    container_name: faculty
+    build: ./faculty
+    image: mohamedsalama118/faculty
+    ports:
+      - 8083:8080
+    volumes:
+      - ./faculty/src:/faculty/src
+      - ./shared/utils:/faculty/src/shared/utils
+      - ./shared/controllers:/faculty/src/shared/controllers
+      - ./shared/middlewares:/faculty/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://faculty_db:27017/faculty
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - faculty_db
 
-  # department_db:
-  #   container_name: department_db
-  #   image: mohamedsalama118/mongo
-  #   ports:
-  #     - 27021:27017
-  #   volumes:
-  #     - ./data/department:/data/db
+  department_db:
+    container_name: department_db
+    image: mohamedsalama118/mongo
+    ports:
+      - 27021:27017
+    volumes:
+      - ./data/department:/data/db
 
-  # department:
-  #   container_name: department
-  #   build: ./department
-  #   image: mohamedsalama118/department
-  #   ports:
-  #     - 8084:8080
-  #   volumes:
-  #     - ./department/src:/department/src
-  #     - ./shared/utils:/department/src/shared/utils
-  #     - ./shared/controllers:/department/src/shared/controllers
-  #     - ./shared/middlewares:/department/src/shared/middlewares
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=8080
-  #     - MONGO_URL=mongodb://department_db:27017/department
-  #     - EMAIL=nars-qa@outlook.com
-  #     - EMAIL_PASSWORD=NARSsystem
-  #     - EXPIRES_IN=90d
-  #     - JWT_COOKIE_EXPIRES_IN=90
-  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+  department:
+    container_name: department
+    build: ./department
+    image: mohamedsalama118/department
+    ports:
+      - 8084:8080
+    volumes:
+      - ./department/src:/department/src
+      - ./shared/utils:/department/src/shared/utils
+      - ./shared/controllers:/department/src/shared/controllers
+      - ./shared/middlewares:/department/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://department_db:27017/department
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
 
-  # surveys:
-  #   container_name: surveys
-  #   build: ./surveys
-  #   image: mohamedsalama118/surveys
-  #   ports:
-  #     - 8082:8080
-  #   volumes:
-  #     - ./surveys/src:/surveys/src
-  #     - ./shared/utils:/surveys/src/shared/utils
-  #     - ./shared/controllers:/surveys/src/shared/controllers
-  #     - ./shared/middlewares:/surveys/src/shared/middlewares
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=8080
-  #     - MONGO_URL=mongodb://survey_db:27017/surveys
-  #     - EMAIL=nars-qa@outlook.com
-  #     - EMAIL_PASSWORD=NARSsystem
-  #     - EXPIRES_IN=90d
-  #     - JWT_COOKIE_EXPIRES_IN=90
-  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
-  #   depends_on:
-  #     - survey_db
-  # courses:
-  #   container_name: courses
-  #   build: ./courses
-  #   image: mohamedsalama118/courses
-  #   ports:
-  #     - 8087:8080
-  #   volumes:
-  #     - ./courses/src:/courses/src
-  #     - ./shared/utils:/courses/src/shared/utils
-  #     - ./shared/controllers:/courses/src/shared/controllers
-  #     - ./shared/middlewares:/courses/src/shared/middlewares
-  #   environment:
-  #     - NODE_ENV=development
-  #     - PORT=8080
-  #     - MONGO_URL=mongodb://courses_db:27017/courses
-  #     - EMAIL=nars-qa@outlook.com
-  #     - EMAIL_PASSWORD=NARSsystem
-  #     - EXPIRES_IN=90d
-  #     - JWT_COOKIE_EXPIRES_IN=90
-  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
-  #   depends_on:
-  #     - courses_db
+  surveys:
+    container_name: surveys
+    build: ./surveys
+    image: mohamedsalama118/surveys
+    ports:
+      - 8082:8080
+    volumes:
+      - ./surveys/src:/surveys/src
+      - ./shared/utils:/surveys/src/shared/utils
+      - ./shared/controllers:/surveys/src/shared/controllers
+      - ./shared/middlewares:/surveys/src/shared/middlewares
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://survey_db:27017/surveys
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - survey_db
+  courses:
+    container_name: courses
+    build: ./courses
+    image: mohamedsalama118/courses
+    ports:
+      - 8087:8080
+    volumes:
+      - ./courses/src:/courses/src
+      - ./shared/utils:/courses/src/shared/utils
+      - ./shared/controllers:/courses/src/shared/controllers
+      - ./shared/middlewares:/courses/src/shared/middlewares
+      - ./public/exams:/courses/src/public/exams
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGO_URL=mongodb://courses_db:27017/courses
+      - EMAIL=nars-qa@outlook.com
+      - EMAIL_PASSWORD=NARSsystem
+      - EXPIRES_IN=90d
+      - JWT_COOKIE_EXPIRES_IN=90
+      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+    depends_on:
+      - courses_db
   nginx:
     build: ./nginx
     container_name: ms_nginx
     depends_on:
       - users
-      # - department
-      # - faculty
-      # - surveys
-      # - courses
+      - department
+      - faculty
+      - surveys
+      - courses
     ports:
       - 80:80

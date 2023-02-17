@@ -1,9 +1,12 @@
+const path = require("path");
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const AppError = require("./shared/utils/appError");
 const cookieParser = require("cookie-parser");
 const courseRoute = require("./routes/courseRoute");
+const examRoute = require("./routes/examRoutes");
+const marksRoute = require("./routes/marksRoutes");
 const globalErrorHandler = require("./shared/controllers/errorController");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -31,7 +34,8 @@ app.use(
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
+app.use("/:course/marks", marksRoute);
+app.use("/exams", examRoute);
 app.use("/", courseRoute);
 
 app.all("*", (req, res, next) => {

@@ -13,7 +13,7 @@ router.patch("/resetPassword", authController.resetPassword);
 router.post("/signup", authController.signupWithEmail);
 router.post("/completeSignup", authController.completeSignup);
 router.post("/login", authController.login);
-
+router.patch("/addPassedCourses/:id", studentController.addPassedCourses);
 router
   .route("/students/")
   .get(authController.protect, studentController.getAllStudents)
