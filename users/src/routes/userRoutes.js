@@ -38,10 +38,13 @@ router
   );
 
 router
-  .route("/updateMe")
-  .patch(authController.protect, studentController.updateMe);
+  .route("/students/updateMe")
+  .patch(authController.protect,studentController.uploadUserPhoto,studentController.updateMe);
 
 //Staff
+router
+  .route("/staff/updateMe")
+  .patch(authController.protect,staffController.uploadUserPhoto,staffController.updateMe);
 router
   .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
