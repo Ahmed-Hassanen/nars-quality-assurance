@@ -25,12 +25,21 @@ const courseInstanceSchema = new mongoose.Schema({
       date: Date,
     },
   ],
-  marks: [
-    {
-      studentId: mongoose.Schema.ObjectId,
-      mark: Number,
-    },
-  ],
+  marks: {
+    type: [
+      {
+        studentId: {
+          type: String,
+          required: [true, "you should specify student id"],
+        },
+        mark: {
+          type: String,
+          required: [true, "you should specify student mark"],
+        },
+      },
+    ],
+  },
+
   exams: [mongoose.Schema.ObjectId],
   students: [mongoose.Schema.ObjectId],
   assignments: [mongoose.Schema.ObjectId],

@@ -31,7 +31,13 @@ const courseSchema = new mongoose.Schema({
        ],
     required: [true, "Competences must have a description"],
 },
+  department: mongoose.Schema.ObjectId,
+  faculty: mongoose.Schema.ObjectId,
   exams: [mongoose.Schema.ObjectId],
+  fullMark: {
+    type: Number,
+    required: [true, "course must have a full mark"],
+  },
 });
 
 const Course = mongoose.model("course", courseSchema);
