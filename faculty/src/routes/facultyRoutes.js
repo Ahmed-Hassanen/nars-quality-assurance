@@ -6,25 +6,24 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(protect, restrictTo("faculty admin"), facultyController.getAllFaculties)
-  .post(protect, restrictTo("faculty admin"), facultyController.createFaculty);
+  .get(protect, facultyController.getAllFaculties)
+  .post(protect, facultyController.createFaculty);
 router.route("/getFacultySummary/:id").get(facultyController.getFacultySummary);
 
-router
-  .route("/updateCompetences/:id")
-  .patch(
-    protect,
-    restrictTo("faculty admin"),
-    facultyController.updateCompetences,
-    facultyController.getFaculty
-  );
+// router
+//   .route("/updateCompetences/:id")
+//   .patch(
+//     protect,
+//     facultyController.updateCompetences,
+//     facultyController.getFaculty
+//   );
 router
   .route("/:id")
-  .get(protect, restrictTo("faculty admin"), facultyController.getFaculty)
-  .patch(protect, restrictTo("faculty admin"), facultyController.updateFaculty)
+  .get(protect, facultyController.getFaculty)
+  .patch(protect, facultyController.updateFaculty)
   .delete(
     protect,
-    restrictTo("faculty admin"),
+
     facultyController.deletefaculty
   );
 
