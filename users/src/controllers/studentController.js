@@ -2,6 +2,8 @@ const Student = require("../models/studentModel");
 const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
+
+const multer = require('multer');
 const { exists } = require("../models/studentModel");
 const axios = require("axios");
 
@@ -36,13 +38,29 @@ exports.createStudent = catchAsync(async (req, res, next) => {
   });
 });
 
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/photos/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
+  }
 };
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('photo');
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create error if user POSTs password data
@@ -74,6 +92,13 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: updatedUser,
   });
 });
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
 
 exports.addPassedCourses = catchAsync(async (req, res, next) => {
   let query = Student.findById(req.params.id);
@@ -104,3 +129,4 @@ exports.addPassedCourses = catchAsync(async (req, res, next) => {
     data: doc,
   });
 });
+

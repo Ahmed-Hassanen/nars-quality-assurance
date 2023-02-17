@@ -4,7 +4,7 @@ const AppError = require("./../shared/utils/appError");
 const Course = require("../models/courseModel");
 const CourseInstance = require("../models/courseInstanceModel");
 const axios = require("axios");
-
+const multer = require('multer');
 exports.createCourse = factory.createOne(Course);
 exports.updateCourse = factory.updateOne(Course);
 exports.deleteCourse = factory.deleteOne(Course);

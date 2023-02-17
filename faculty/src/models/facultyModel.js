@@ -13,10 +13,21 @@ const facultySchema = new mongoose.Schema({
     type: String,
     required: [true, "faculty must have about"],
   },
-  competences: {
-    type: [Object],
-    required: [true, "faculty must have competences"],
-  },
+  competences:{
+    type:[
+        {
+    code:{
+     type:String,
+    required: [true, "program must have a code"],
+         },
+    description:{
+    type:String,
+    required: [true, "program must have a description"],
+               }
+    }
+       ],
+    required: [true, "Competences must have a description"],
+},
   academicYears: {
     type: [String],
     required: [true, "department must have academic years"],
