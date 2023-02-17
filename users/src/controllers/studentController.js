@@ -2,6 +2,7 @@ const Student = require("../models/studentModel");
 const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
+const { exists } = require("../models/studentModel");
 
 exports.getStudent = factory.getOne(Student);
 exports.getAllStudents = factory.getAll(Student);
@@ -45,5 +46,29 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: updatedUser,
+  });
+});
+
+exports.addPassedCourses = catchAsync(async (req, res, next) => {
+  let query = Student.findById(req.params.id);
+
+  const doc = await query;
+
+  if (!doc) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  let exists = false;
+  doc.passedCourses.forEach((course) => {
+    if (course == req.body.passedCourse) exists = true;
+  });
+  console.log(req.body.passedCourse);
+  if (!exists) {
+    doc.passedCourses.push(req.body.passedCourse);
+  }
+  doc.save();
+  res.status(200).json({
+    status: "success",
+
+    data: doc,
   });
 });
