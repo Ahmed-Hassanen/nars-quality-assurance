@@ -10,6 +10,7 @@ const marksRoute = require("./routes/marksRoutes");
 const globalErrorHandler = require("./shared/controllers/errorController");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const { Kafka } = require("kafkajs");
 
 const app = express();
 

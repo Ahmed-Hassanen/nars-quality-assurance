@@ -24,7 +24,6 @@ const createSendToken = (user, statusCode, req, res) => {
     // secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   };
 
-  
   res.cookie("jwt", token, cookieOptions);
 
   user.password = undefined;
@@ -236,6 +235,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
+  console.log("Headers are " + JSON.stringify(req.headers.authorization));
+  console.log("Received token is " + token);
 
   if (!token) {
     return next(

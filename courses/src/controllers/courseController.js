@@ -4,7 +4,16 @@ const AppError = require("./../shared/utils/appError");
 const Course = require("../models/courseModel");
 const CourseInstance = require("../models/courseInstanceModel");
 const axios = require("axios");
-const multer = require('multer');
+const { Kafka } = require("kafkajs");
+
+const kafka = new Kafka({
+  clientId: "my-app",
+  brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
+});
+
+const producer = kafka.producer();
+
+const multer = require("multer");
 exports.createCourse = factory.createOne(Course);
 exports.updateCourse = factory.updateOne(Course);
 exports.deleteCourse = factory.deleteOne(Course);
@@ -84,40 +93,33 @@ exports.updateCourseInstance = factory.updateOne(CourseInstance);
 exports.getCourseInstance = factory.getOne(CourseInstance);
 exports.getAllCourseInstances = factory.getAll(CourseInstance);
 
-exports.assignCourseConstructor = catchAsync(async (req, res, next) => {
+exports.assignCourseInstructor = catchAsync(async (req, res, next) => {
   const instructorId = req.body.instructorId;
+  const courseId = req.body.courseId;
 
-  const course = await CourseInstance.findById(req.params.id);
-
-  const foundInstructor = course.instructors.findIndex(
-    (e) => e == instructorId
-  );
-  console.log("Has found it ? " + foundInstructor);
-  if (foundInstructor > -1) {
-    return next(
-      new AppError("This instructor is already assigned to this course!")
-    );
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
-
-  const doc = await CourseInstance.findByIdAndUpdate(
-    req.params.id,
-    {
-      $push: { instructors: req.body.instructorId },
-    },
-    {
-      new: true, //return updated document
-      runValidators: true,
-    }
-  );
-
-  //update staff user to contain this course as well
-  const header = `authorization: Bearer ${req.cookies.jwt}`;
   const staffData = await axios
-    .patch(`http://users:8080/staff/update-staff-courses/${instructorId}`, {
-      headers: header,
-    })
+    .patch(
+      `http://users:8080/staff/update-staff-courses`,
+      {
+        courseId,
+        instructorId,
+      },
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    )
     .then((res) => res.data)
     .catch((e) => {
+      console.log("EXCPETIOB IS " + e);
       return {
         status: false,
         message: "something went wrong",
@@ -128,7 +130,7 @@ exports.assignCourseConstructor = catchAsync(async (req, res, next) => {
   if (staffData.status) {
     res.status(201).json({
       status: "success",
-      data: doc,
+      staff: staffData.staff,
     });
   } else {
     res.status(staffData.code).json({
@@ -136,4 +138,16 @@ exports.assignCourseConstructor = catchAsync(async (req, res, next) => {
       message: staffData.message,
     });
   }
+});
+
+exports.sendAssignCourseEvent = catchAsync(async (req, res, next) => {
+  const data = {
+    courseId: req.body.courseId,
+    instructorId: req.body.instructorId,
+  };
+  await producer.connect();
+  await producer.send({
+    topic: process.env.KAFKA_ASSIGN_COURSE_TOPIC,
+    messages: [{ value: JSON.stringify(data) }],
+  });
 });
