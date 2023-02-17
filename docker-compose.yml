@@ -32,6 +32,7 @@ services:
       - 27019:27017
     volumes:
       - ./data/competences:/data/db
+
   courses_db:
     container_name: courses_db
     image: mohamedsalama118/mongo
@@ -64,6 +65,7 @@ services:
       - ./shared/utils:/users/src/shared/utils
       - ./shared/controllers:/users/src/shared/controllers
       - ./shared/middlewares:/users/src/shared/middlewares
+      - ./public/photos:/users/src/public/photos
     environment:
       - NODE_ENV=development
       - PORT=8080
@@ -118,8 +120,7 @@ services:
       - JWT_COOKIE_EXPIRES_IN=90
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
-      - program_db    
-
+      - program_db       
   faculty_db:
     container_name: faculty_db
     image: mohamedsalama118/mongo
@@ -212,6 +213,8 @@ services:
       - ./shared/utils:/courses/src/shared/utils
       - ./shared/controllers:/courses/src/shared/controllers
       - ./shared/middlewares:/courses/src/shared/middlewares
+      - ./public/materials:/courses/src/public/materials
+      - ./public/exams:/courses/src/public/exams
     environment:
       - NODE_ENV=development
       - PORT=8080

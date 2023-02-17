@@ -13,10 +13,21 @@ const departmentSchema = new mongoose.Schema({
     type: String,
     required: [true, "department must have a department head"],
   },
-  competences: {
-    type: [Object],
-    required: [true, "faculty must have competences"],
-  },
+  competences:{
+    type:[
+        {
+    code:{
+     type:String,
+    required: [true, "program must have a code"],
+         },
+    description:{
+    type:String,
+    required: [true, "program must have a description"],
+               }
+    }
+       ],
+    required: [true, "Competences must have a description"],
+},
   faculty: {
     type: String,
     required: [true, "department must belong to faculty"],

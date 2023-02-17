@@ -2,7 +2,6 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
-
 const studentSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -54,7 +53,7 @@ const studentSchema = new mongoose.Schema({
   faculty: mongoose.Schema.ObjectId,
   department: mongoose.Schema.ObjectId,
   academicYear: {
-    type: String,
+    type: [String],
     required: [true, "student must belong to academic year"],
   },
   role: String,

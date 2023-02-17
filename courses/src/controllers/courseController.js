@@ -13,6 +13,7 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
+const multer = require("multer");
 exports.createCourse = factory.createOne(Course);
 exports.updateCourse = factory.updateOne(Course);
 exports.deleteCourse = factory.deleteOne(Course);
@@ -27,13 +28,17 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   const header = `authorization: Bearer ${req.cookies.jwt}`;
   console.log("Program is " + orignalCourse.program);
   console.log("Year is " + orignalCourse.academicYear);
+  let url;
+  if (orignalCourse.program)
+    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`;
+  else if (orignalCourse.department)
+    url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear=${orignalCourse.academicYear}`;
+  else
+    url = `http://users:8080/students/?faculty=${orignalCourse.faculty}&academicYear=${orignalCourse.academicYear}`;
   const studentsData = await axios
-    .get(
-      `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`,
-      {
-        headers: header,
-      }
-    )
+    .get(url, {
+      headers: header,
+    })
     .then((res) => res.data)
     .catch((e) => {
       return {

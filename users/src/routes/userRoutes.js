@@ -13,7 +13,7 @@ router.patch("/resetPassword", authController.resetPassword);
 router.post("/signup", authController.signupWithEmail);
 router.post("/completeSignup", authController.completeSignup);
 router.post("/login", authController.login);
-
+router.patch("/addPassedCourses/:id", studentController.addPassedCourses);
 router
   .route("/students/")
   .get(authController.protect, studentController.getAllStudents)
@@ -38,10 +38,13 @@ router
   );
 
 router
-  .route("/updateMe")
-  .patch(authController.protect, studentController.updateMe);
+  .route("/students/updateMe")
+  .patch(authController.protect,studentController.uploadUserPhoto,studentController.updateMe);
 
 //Staff
+router
+  .route("/staff/updateMe")
+  .patch(authController.protect,staffController.uploadUserPhoto,staffController.updateMe);
 router
   .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
