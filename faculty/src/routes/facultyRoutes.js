@@ -8,13 +8,7 @@ router
   .route("/")
   .get(protect, restrictTo("faculty admin"), facultyController.getAllFaculties)
   .post(protect, restrictTo("faculty admin"), facultyController.createFaculty);
-router
-  .route("/getFacultySummary/:id")
-  .get(
-    protect,
-    restrictTo("faculty admin", "department admin"),
-    facultyController.getFacultySummary
-  );
+router.route("/getFacultySummary/:id").get(facultyController.getFacultySummary);
 
 router
   .route("/updateCompetences/:id")
