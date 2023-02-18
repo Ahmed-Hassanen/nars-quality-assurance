@@ -170,9 +170,13 @@ isPassedCourse = catchAsync(async (req, res, next) => {
     }
   });
 
-  const promises = await Promise.all(updatedStudents);
-  if (!promises) {
-    return next(new AppError("something went wrong ", 500));
-  }
+  const promises = Promise.all(updatedStudents)
+    .then(console.log("done"))
+    .catch((err) => {
+      console.log(err);
+    });
+  // if (!promises) {
+  //   return next(new AppError("something went wrong ", 500));
+  // }
   next();
 });

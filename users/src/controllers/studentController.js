@@ -3,7 +3,7 @@ const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
 
-const multer = require('multer');
+const multer = require("multer");
 const { exists } = require("../models/studentModel");
 const axios = require("axios");
 
@@ -48,19 +48,19 @@ const multerStorage = multer.diskStorage({
 });
 
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
+  if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
   }
 };
 
 const upload = multer({
   storage: multerStorage,
-  fileFilter: multerFilter
+  fileFilter: multerFilter,
 });
 
-exports.uploadUserPhoto = upload.single('photo');
+exports.uploadUserPhoto = upload.single("photo");
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create error if user POSTs password data
@@ -118,7 +118,7 @@ exports.addPassedCourses = catchAsync(async (req, res, next) => {
     doc.passedCourses.push(req.body.passedCourse);
   }
   if (
-    (doc.passedCourses.length = doc.courses.length - 2) &&
+    doc.passedCourses.length >= doc.courses.length - 2 &&
     doc.passedCourses.length != exPassedCourses
   )
     doc.academicYear.shift();
@@ -129,4 +129,3 @@ exports.addPassedCourses = catchAsync(async (req, res, next) => {
     data: doc,
   });
 });
-

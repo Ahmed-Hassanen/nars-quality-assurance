@@ -37,7 +37,7 @@ const courseInstanceSchema = new mongoose.Schema({
           required: [true, "you should specify student id"],
         },
         mark: {
-          type: String,
+          type: Number,
           required: [true, "you should specify student mark"],
         },
       },
