@@ -30,11 +30,11 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   console.log("Year is " + orignalCourse.academicYear);
   let url;
   if (orignalCourse.program)
-    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`;
+    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear.0=${orignalCourse.academicYear}`;
   else if (orignalCourse.department)
-    url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear=${orignalCourse.academicYear}`;
+    url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear.0=${orignalCourse.academicYear}`;
   else
-    url = `http://users:8080/students/?faculty=${orignalCourse.faculty}&academicYear=${orignalCourse.academicYear}`;
+    url = `http://users:8080/students/?faculty=${orignalCourse.faculty}&academicYear.0=${orignalCourse.academicYear}`;
   const studentsData = await axios
     .get(url, {
       headers: header,
@@ -50,9 +50,9 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   if (studentsData.status === false) {
     return next(new AppError(studentsData.message, studentsData.code));
   }
-  if (studentsData.results === 0) {
-    return next(new AppError("no student at this program", 400));
-  }
+  // if (studentsData.results === 0) {
+  //   return next(new AppError("no student at this program", 400));
+  // }
   const students = [];
   studentsData.data.forEach((student) => {
     if (
