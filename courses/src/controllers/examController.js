@@ -30,7 +30,7 @@ exports.addExam = catchAsync(async (req, res, next) => {
     return next(new AppError("No document found with that id", 404));
   }
   req.body.title = `${req.body.description}-Exam-${req.body.date}-${course.name}`;
-  req.body.path = `${Date.now()}-${req.body.title}`;
+  req.body.path = `${req.file.filename}`;
 
   const doc = await Exam.create(req.body);
   res.status(201).json({
@@ -51,14 +51,14 @@ exports.getExam = catchAsync(async (req, res, next) => {
   if (!exam) {
     return next(new AppError("No document found with that id", 404));
   }
-  console.log(exam);
-  console.log(exam.path);
-  res.attachment(path.resolve(`public/exams/${exam.path}`));
+  console.log("hereeeeeeeeeeeeee");
+  console.log(path.resolve(`/${__dirname}/../public/exams${exam.path}`));
+  res.download(path.resolve(`/${__dirname}/../public/exams/${exam.path}`));
+  // res.send();
+  // res.status(200).json({
+  //   status: "success",
 
-  res.status(200).json({
-    status: "success",
-
-    data: exam,
-  });
+  //   data: exam,
+  // });
 });
 exports.uploadExam = upload.single("exam");
