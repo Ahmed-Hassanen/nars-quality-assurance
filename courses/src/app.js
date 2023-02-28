@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 //support parsing of application/x-www-form-urlencoded post data
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use("/static", express.static(path.join(__dirname, "public")));
 app.enable("trust proxy");
 app.use(cookieParser());
 
