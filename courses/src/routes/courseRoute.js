@@ -21,6 +21,7 @@ router
 
 router
   .route("/original-courses/:id")
+  .get(protect, restrictTo("system admin"), courseController.getCourse)
   .patch(protect, restrictTo("system admin"), courseController.updateCourse)
   .delete(protect, restrictTo("system admin"), courseController.deleteCourse);
 

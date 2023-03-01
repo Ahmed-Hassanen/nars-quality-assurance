@@ -17,6 +17,7 @@ const multer = require("multer");
 exports.createCourse = factory.createOne(Course);
 exports.updateCourse = factory.updateOne(Course);
 exports.deleteCourse = factory.deleteOne(Course);
+exports.getCourse = factory.getOne(Course);
 exports.getAllCourses = factory.getAll(Course);
 
 exports.createCourseInstance = catchAsync(async (req, res, next) => {
