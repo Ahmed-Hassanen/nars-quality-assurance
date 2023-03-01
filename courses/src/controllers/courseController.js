@@ -85,7 +85,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
           courses: student.courses,
         },
         {
-          headers: { authorization: `Bearer ${req.cookies.jwt}` },
+          headers: { authorization: `Bearer ${token}` },
         }
       )
     );
