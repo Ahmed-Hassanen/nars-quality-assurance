@@ -26,7 +26,15 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   if (!orignalCourse) {
     return next(new AppError("No document found with that id", 404));
   }
-  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
   console.log("Program is " + orignalCourse.program);
   console.log("Year is " + orignalCourse.academicYear);
   let url;
@@ -38,7 +46,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
     url = `http://users:8080/students/?faculty=${orignalCourse.faculty}&academicYear.0=${orignalCourse.academicYear}`;
   const studentsData = await axios
     .get(url, {
-      headers: header,
+      headers: { authorization: `Bearer ${token}` },
     })
     .then((res) => res.data)
     .catch((e) => {
