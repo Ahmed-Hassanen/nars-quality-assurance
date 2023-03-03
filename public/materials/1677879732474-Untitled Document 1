@@ -1,0 +1,207 @@
+const multer = require("multer");
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/materials/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({storage: multerStorage});
+ 
+exports.uploadMaterials = upload.single('materialsPaths');
+exports.addMaterials = catchAsync(async (req, res, next) => {
+//  if(!req.file){
+//  return  next(new AppError('there is no file updated',400));
+//  }
+// const filteredBody = filterObj(req.body);
+ 
+//  filteredBody.materialPaths.push(req.file.filename);
+//  console.log(req.params.id)
+const course = await CourseInstance.findById(req.params.id);
+
+//  if(!course){
+//   return next(new AppError("No document found with that id", 404));
+//  }
+ res.status(201).json({
+  status: "success",
+  data:course
+});
+});
+exports.viewComp=catchAsync(async (req,res,next)=>{
+  let query = Course.findById(req.params.id);
+  const doc = await query;
+  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  const faculty = await axios
+    .get(`http://faculty:8080/getFacultySummary/${doc.faculty}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+
+  const department = await axios
+    .get(`http://department:8080/getDepartmentSummary/${doc.department}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+    const program = await axios
+    .get(`http://programs:8080/getProgramSummary/${doc.program}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+    
+    res.status(201).json({
+      status: "success",
+      programComp:program.data.competences,
+      facultyComp:faculty.data.competences,
+      departmentComp:department.data.competences
+    });
+
+}
+)
+
+exports.checkComp = catchAsync(async (req, res, next) => {
+  let query1 = CourseInstance.findById(req.params.id);
+  const doc1 = await query1;
+
+  let query2 = Course.findById(doc1.course).select('-id');
+  const doc2 = await query2
+  const temp =[];
+  for(let i=0;i<doc2.competences.length;i++){
+    temp[i]={"code":doc2.competences[i].code,"description":doc2.competences[i].description}
+  }
+
+  doc1.approved=true;
+  res.status(201).json({
+    status: "success",
+    data: doc1,
+  });
+}
+)
+
+router
+.route("/checkCompetences/:id")
+.patch(protect, courseController.checkComp);
+
+router.route("/viewComp/:id").get(protect,courseController.viewComp);
+
+exports.getDepartmentSummary = factory.getOne(Department);
+
+router.route("/getDepartmentSummary/:id").get(departmentController.getDepartmentSummary);
+
+exports.getProgram=catchAsync(async (req, res, next) => {
+    let query = Program.findById(req.params.id);
+    const doc = await query;
+    if (!doc) {
+      return next(new AppError("No document found with that id", 404));
+    }
+    const header = `authorization: Bearer ${req.cookies.jwt}`;
+  
+    const department = await axios
+      .get(`http://department:8080/getDepartmentSummary/${doc.department}`, {
+        headers: header,
+      })
+      .then((res) => res.data)
+      .catch((e) => {
+        return {
+          status: false,
+          message: "something went wrong",
+          code: 500,
+        };
+      });
+    doc.department = department.data.name;
+    res.status(200).json({
+      status: "success",
+      data: doc,
+    });
+  });
+  /
+  exports.getProgramSummary=factory.getOne(Program);
+  
+  const axios = require("axios");
+  
+  
+router.get("getProgramSummary/:id", programController.getProgramSummary);
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/photos/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage
+  fileFilter: multerFilter,
+});
+
+exports.uploadUserPhoto = upload.single("photo");
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.file);
+  // 1) Create error if user POSTs password data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        "This route is not for password updates. Please use /updateMyPassword.",
+        400
+      )
+    );
+  }
+
+  // 2) Filtered out unwanted fields names that are not allowed to be updated
+  const filteredBody = filterObj(req.body, "name", "email", "about");
+  if (req.file) filteredBody.photo = req.file.filename;
+
+  // 3) Update user document
+  const updatedUser = await Staff.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: updatedUser,
+  });
+});
+
+const multer = require("multer");/\

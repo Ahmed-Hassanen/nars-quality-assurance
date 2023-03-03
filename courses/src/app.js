@@ -6,6 +6,8 @@ const AppError = require("./shared/utils/appError");
 const cookieParser = require("cookie-parser");
 const courseRoute = require("./routes/courseRoute");
 const examRoute = require("./routes/examRoutes");
+const assignmentRoute = require("./routes/assignmentRoutes");
+const assignmentSolutionsRoute = require("./routes/assignmentSolutionsRoutes");
 const marksRoute = require("./routes/marksRoutes");
 const globalErrorHandler = require("./shared/controllers/errorController");
 const bodyParser = require("body-parser");
@@ -37,6 +39,8 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/:course/marks", marksRoute);
 app.use("/exams", examRoute);
+app.use("/assignment", assignmentRoute);
+app.use("/assignmentSolution",assignmentSolutionsRoute);
 app.use("/", courseRoute);
 
 app.all("*", (req, res, next) => {

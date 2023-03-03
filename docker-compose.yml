@@ -214,6 +214,8 @@ services:
       - ./shared/middlewares:/courses/src/shared/middlewares
       - ./public/materials:/courses/src/public/materials
       - ./public/exams:/courses/src/public/exams
+      - ./public/assignments:/courses/src/public/assignments
+      - ./public/assignmentSolutions:/courses/src/public/assignmentSolutions
     environment:
       - NODE_ENV=development
       - PORT=8080

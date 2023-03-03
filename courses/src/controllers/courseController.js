@@ -20,6 +20,34 @@ exports.deleteCourse = factory.deleteOne(Course);
 exports.getCourse = factory.getOne(Course);
 exports.getAllCourses = factory.getAll(Course);
 
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/materials/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({storage: multerStorage});
+ 
+exports.addMaterials = catchAsync(async (req, res, next) => {
+ if(!req.file){
+ return  next(new AppError('there is no file updated',400));
+ }
+const course = await CourseInstance.findById(req.body.course);
+
+ if(!course){
+  return next(new AppError("No document found with that id", 404));
+ }
+ console.log(req.file.filename,'hhhhhhhhhhhhhh')
+ course.materialsPaths.push(req.file.filename);
+ res.status(201).json({
+  status: "success",
+  data:course
+});
+});
+exports.uploadMaterials = upload.single('materialsPaths');
 exports.createCourseInstance = catchAsync(async (req, res, next) => {
   query = Course.findById(req.body.course);
   const orignalCourse = await query;
