@@ -4,12 +4,12 @@ const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 
 const router = express.Router();
-
+router.route("/viewComp/:id").get(protect,courseController.viewComp);
 router
   .route("/original-courses")
   .get(protect, courseController.getAllCourses)
   .post(protect, restrictTo("system admin"), courseController.createCourse);
-
+  router.route("/checkComp/:id").post(protect,courseController.checkComp);
 router
   .route("/created-courses")
   .get(protect, courseController.getAllCourseInstances)
