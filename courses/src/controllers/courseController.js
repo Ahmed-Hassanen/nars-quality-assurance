@@ -40,7 +40,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   let url;
   if (orignalCourse.program) {
     console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`;
+    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear.0=${orignalCourse.academicYear}`;
   } else if (orignalCourse.department)
     url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear.0=${orignalCourse.academicYear}`;
   else
