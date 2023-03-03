@@ -38,9 +38,10 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   console.log("Program is " + orignalCourse.program);
   console.log("Year is " + orignalCourse.academicYear);
   let url;
-  if (orignalCourse.program)
-    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear.0=${orignalCourse.academicYear}`;
-  else if (orignalCourse.department)
+  if (orignalCourse.program) {
+    console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+    url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear=${orignalCourse.academicYear}`;
+  } else if (orignalCourse.department)
     url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear.0=${orignalCourse.academicYear}`;
   else
     url = `http://users:8080/students/?faculty=${orignalCourse.faculty}&academicYear.0=${orignalCourse.academicYear}`;
@@ -73,7 +74,20 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
     }
   });
   req.body.students = students;
+
+  //Update Course Specs if created before
+  let courseSpecs;
+  const course = await CourseInstance.findOne({
+    course: req.body.course,
+    instructor: req.body.instructor,
+  });
+  if (course && course.courseSpecs) {
+    courseSpecs = course.courseSpecs;
+  }
+
   const courseinstance = await CourseInstance.create(req.body);
+  courseinstance.courseSpecs = courseSpecs;
+  await courseinstance.save();
   const updatedStudents = [];
   studentsData.data.forEach((student) => {
     student.courses.push(courseinstance._id);
@@ -92,6 +106,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   });
 
   const promises = await Promise.all(updatedStudents);
+
   res.status(201).json({
     status: "success",
     data: courseinstance,
