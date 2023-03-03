@@ -3,15 +3,16 @@ const programController = require("../controllers/programController");
 const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 const router = express.Router();
-router.post("/",protect,restrictTo("program admin"), programController.addProgram);
+router.get("/getProgramSummary/:id", programController.getProgramSummary);
+router.post("/",protect, programController.addProgram);
 
-router.get("/",protect,restrictTo("program admin"), programController.getAllPrograms);
+router.get("/",protect,programController.getAllPrograms);
 
-router.get("/:id",protect,restrictTo("program admin"), programController.getProgram);
+router.get("/:id",protect, programController.getProgram);
 
-router.patch("/:id",protect,restrictTo("program admin"), programController.UpdateProgram);
+router.patch("/:id",protect, programController.UpdateProgram);
 
-router.delete("/:id",protect,restrictTo("program admin"), programController.deleteProgram);
+router.delete("/:id",protect, programController.deleteProgram);
 
 module.exports = router;
 

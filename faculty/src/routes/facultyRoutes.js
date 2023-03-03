@@ -3,12 +3,11 @@ const facultyController = require("../controllers/facultyController");
 const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 const router = express.Router();
-
+router.route("/getFacultySummary/:id").get(facultyController.getFacultySummary);
 router
   .route("/")
   .get(protect, facultyController.getAllFaculties)
   .post(protect, facultyController.createFaculty);
-router.route("/getFacultySummary/:id").get(facultyController.getFacultySummary);
 
 // router
 //   .route("/updateCompetences/:id")

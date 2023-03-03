@@ -6,6 +6,7 @@ const axios = require("axios");
 
 exports.getAllDepartments = factory.getAll(Department);
 exports.deleteDepartment = factory.deleteOne(Department);
+exports.getDepartmentSummary = factory.getOne(Department);
 exports.updateDepartment = factory.updateOne(Department);
 exports.createDepartment = catchAsync(async (req, res, next) => {
   // if (!req.body.competences) {

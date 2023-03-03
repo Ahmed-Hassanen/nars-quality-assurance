@@ -3,7 +3,7 @@ const departmentController = require("../controllers/departmentController");
 const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 const router = express.Router();
-
+router.route("/getDepartmentSummary/:id").get(departmentController.getDepartmentSummary);
 router.route("/").get(departmentController.getAllDepartments).post(
   protect,
 

@@ -148,7 +148,87 @@ exports.assignCourseInstructor = catchAsync(async (req, res, next) => {
     });
   }
 });
+exports.viewComp=catchAsync(async (req,res,next)=>{
+  let query = Course.findById(req.params.id);
+  const doc = await query;
+  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  const faculty = await axios
+    .get(`http://faculty:8080/getFacultySummary/${doc.faculty}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
 
+  const department = await axios
+    .get(`http://department:8080/getDepartmentSummary/${doc.department}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+    const program = await axios
+    .get(`http://programs:8080/getProgramSummary/${doc.program}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => {
+      return {
+        status: false,
+        message: "something went wrong",
+        code: 500,
+      };
+    });
+    res.status(201).json({
+      status: "success",
+      programComp:program.data.competences,
+      facultyComp:faculty.data.competences,
+      departmentComp:department.data.competences
+    });
+
+}
+)
+exports.checkComp = catchAsync(async (req, res, next) => {
+  let query1 = CourseInstance.findById(req.params.id);
+  const doc1 = await query1;
+
+  let query2 = Course.findById(doc1.course).select('-id');
+  const doc2 = await query2
+  console.log(doc2)
+  const comp=req.body.competences;
+  const temp =[];
+  for(let i=0;i<doc2.competences.length;i++){
+    temp[i]={"code":doc2.competences[i].code,"description":doc2.competences[i].description}
+  }
+  let ok;
+for(let i=0;i<comp.length;i++){
+  ok=0;
+  for(let j=0;j<temp.length;j++){
+    if(comp[i].code==temp[j].code){
+      ok=1;
+      break;
+    }
+  }
+  if(ok==0){
+    return next(new AppError("not match the competences", 404));
+  }
+}
+  doc1.approved=true;
+  res.status(201).json({
+    status: "success",
+  });
+}
+)
 exports.sendAssignCourseEvent = catchAsync(async (req, res, next) => {
   const data = {
     courseId: req.body.courseId,
