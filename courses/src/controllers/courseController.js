@@ -59,9 +59,9 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   if (studentsData.status === false) {
     return next(new AppError(studentsData.message, studentsData.code));
   }
-  // if (studentsData.results === 0) {
-  //   return next(new AppError("no student at this program", 400));
-  // }
+  if (studentsData.results === 0) {
+    return next(new AppError("no student at this program", 400));
+  }
   const students = [];
   studentsData.data.forEach((student) => {
     if (
@@ -98,7 +98,81 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateCourseInstance = factory.updateOne(CourseInstance);
+exports.updateCourseInstance = catchAsync(async (req, res, next) => {
+  if (!req.body.courseSpecs) {
+    const doc = await CourseInstance.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true, //return updated document
+        runValidators: true,
+      }
+    );
+
+    if (!doc) {
+      return next(new AppError("No document found with that id", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+
+      data: doc,
+    });
+    return next();
+  }
+
+  const course = await CourseInstance.findById(req.params.id);
+  const courseData = req.body.courseSpecs.courseData;
+  const courseAims = req.body.courseSpecs.courseAims;
+  const courseContent = req.body.courseSpecs.courseContent;
+  const studentAcademicCounselingSupport =
+    req.body.courseSpecs.studentAcademicCounselingSupport;
+  const courseLearningOutcomes = req.body.courseSpecs.courseLearningOutcomes;
+  const leacturePlan = req.body.courseSpecs.leacturePlan;
+  const studentAssessment = req.body.courseSpecs.studentAssessment;
+  const facilities = req.body.courseSpecs.facilities;
+  const references = req.body.courseSpecs.references;
+  if (courseData) {
+    course.courseSpecs.courseData = courseData;
+  }
+  if (courseAims) {
+    course.courseSpecs.courseAims = courseAims;
+  }
+  if (courseContent) {
+    course.courseSpecs.courseContent = courseContent;
+  }
+  if (studentAcademicCounselingSupport) {
+    course.courseSpecs.studentAcademicCounselingSupport =
+      studentAcademicCounselingSupport;
+  }
+  if (courseLearningOutcomes) {
+    course.courseSpecs.courseLearningOutcomes = courseLearningOutcomes;
+  }
+  if (leacturePlan) {
+    course.courseSpecs.leacturePlan = leacturePlan;
+  }
+  if (studentAssessment) {
+    course.courseSpecs.studentAssessment = studentAssessment;
+  }
+  if (facilities) {
+    course.courseSpecs.facilities = facilities;
+  }
+  if (references) {
+    course.courseSpecs.references = references;
+  }
+
+  const updatedCourse = await course.save();
+
+  if (!updatedCourse) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: updatedCourse,
+  });
+});
+
 exports.getCourseInstance = factory.getOne(CourseInstance);
 exports.getAllCourseInstances = factory.getAll(CourseInstance);
 
@@ -148,7 +222,7 @@ exports.assignCourseInstructor = catchAsync(async (req, res, next) => {
     });
   }
 });
-exports.viewComp=catchAsync(async (req,res,next)=>{
+exports.viewComp = catchAsync(async (req, res, next) => {
   let query = Course.findById(req.params.id);
   const doc = await query;
   const header = `authorization: Bearer ${req.cookies.jwt}`;
@@ -177,7 +251,7 @@ exports.viewComp=catchAsync(async (req,res,next)=>{
         code: 500,
       };
     });
-    const program = await axios
+  const program = await axios
     .get(`http://programs:8080/getProgramSummary/${doc.program}`, {
       headers: header,
     })
@@ -189,46 +263,46 @@ exports.viewComp=catchAsync(async (req,res,next)=>{
         code: 500,
       };
     });
-    res.status(201).json({
-      status: "success",
-      programComp:program.data.competences,
-      facultyComp:faculty.data.competences,
-      departmentComp:department.data.competences
-    });
-
-}
-)
+  res.status(201).json({
+    status: "success",
+    programComp: program.data.competences,
+    facultyComp: faculty.data.competences,
+    departmentComp: department.data.competences,
+  });
+});
 exports.checkComp = catchAsync(async (req, res, next) => {
   let query1 = CourseInstance.findById(req.params.id);
   const doc1 = await query1;
 
-  let query2 = Course.findById(doc1.course).select('-id');
-  const doc2 = await query2
-  console.log(doc2)
-  const comp=req.body.competences;
-  const temp =[];
-  for(let i=0;i<doc2.competences.length;i++){
-    temp[i]={"code":doc2.competences[i].code,"description":doc2.competences[i].description}
+  let query2 = Course.findById(doc1.course).select("-id");
+  const doc2 = await query2;
+  console.log(doc2);
+  const comp = req.body.competences;
+  const temp = [];
+  for (let i = 0; i < doc2.competences.length; i++) {
+    temp[i] = {
+      code: doc2.competences[i].code,
+      description: doc2.competences[i].description,
+    };
   }
   let ok;
-for(let i=0;i<comp.length;i++){
-  ok=0;
-  for(let j=0;j<temp.length;j++){
-    if(comp[i].code==temp[j].code){
-      ok=1;
-      break;
+  for (let i = 0; i < comp.length; i++) {
+    ok = 0;
+    for (let j = 0; j < temp.length; j++) {
+      if (comp[i].code == temp[j].code) {
+        ok = 1;
+        break;
+      }
+    }
+    if (ok == 0) {
+      return next(new AppError("not match the competences", 404));
     }
   }
-  if(ok==0){
-    return next(new AppError("not match the competences", 404));
-  }
-}
-  doc1.approved=true;
+  doc1.approved = true;
   res.status(201).json({
     status: "success",
   });
-}
-)
+});
 exports.sendAssignCourseEvent = catchAsync(async (req, res, next) => {
   const data = {
     courseId: req.body.courseId,
