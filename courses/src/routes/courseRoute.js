@@ -18,7 +18,9 @@ router
     restrictTo("system admin", "instructor"),
     courseController.createCourseInstance
   );
-
+  router
+  .route("/created-courses/uploadMaterials")
+  .patch(protect, courseController.uploadMaterials,courseController.addMaterials);
 router
   .route("/original-courses/:id")
   .get(protect, restrictTo("system admin"), courseController.getCourse)

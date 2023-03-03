@@ -25,7 +25,6 @@ app.use(
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
 app.use("/", programRouter);
 
 app.all("*", (req, res, next) => {
