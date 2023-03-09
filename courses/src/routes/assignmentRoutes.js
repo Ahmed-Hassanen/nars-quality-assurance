@@ -11,7 +11,7 @@ router.route("/")
 
 router
 .route("/:id")
-.get(protect,assignmentController.getAssignmentById)
+.get(assignmentController.getAssignment)
 .delete(protect,assignmentController.deleteAssignment)
 
 module.exports = router;

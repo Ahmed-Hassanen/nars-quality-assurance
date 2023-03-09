@@ -23,12 +23,6 @@ const courseInstanceSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  materialsPaths: [
-    {
-      path: String,
-      date: Date,
-    },
-  ],
   marks: {
     type: [
       {

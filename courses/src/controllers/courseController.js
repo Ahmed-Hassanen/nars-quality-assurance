@@ -5,7 +5,7 @@ const Course = require("../models/courseModel");
 const CourseInstance = require("../models/courseInstanceModel");
 const axios = require("axios");
 const { Kafka } = require("kafkajs");
-
+const path = require('path');
 const kafka = new Kafka({
   clientId: "my-app",
   brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
@@ -35,16 +35,20 @@ exports.addMaterials = catchAsync(async (req, res, next) => {
  if(!req.file){
  return  next(new AppError('there is no file updated',400));
  }
-const course = await CourseInstance.findById(req.body.course);
+const course = await Course.findById(req.body.course);
 
  if(!course){
   return next(new AppError("No document found with that id", 404));
  }
- console.log(req.file.filename,'hhhhhhhhhhhhhh')
- course.materialsPaths.push(req.file.filename);
+ course.materialsPaths.push({path:req.file.filename,name:req.body.name,description:req.body.description,date:Date.now()});
+ const doc = await Course.findByIdAndUpdate(req.body.course, course, {
+  new: true, //return updated document
+  runValidators: true,
+});
+ console.log(course.materialsPaths.length,'hhhhhhhhhhhhhhhhhhhhhh')
  res.status(201).json({
   status: "success",
-  data:course
+  data:doc
 });
 });
 exports.uploadMaterials = upload.single('materialsPaths');
@@ -266,5 +270,61 @@ exports.sendAssignCourseEvent = catchAsync(async (req, res, next) => {
   await producer.send({
     topic: process.env.KAFKA_ASSIGN_COURSE_TOPIC,
     messages: [{ value: JSON.stringify(data) }],
+  });
+});
+exports.getMaterial = catchAsync(async (req, res, next) => {
+  let query = Course.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const course = await query;
+  if (!course) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  let ok=0;
+  let materialPath
+  for(let i=0;i<course.materialsPaths.length;i++){
+    if(course.materialsPaths[i]._id==req.params.id2){
+      ok=1;
+      materialPath=course.materialsPaths[i].path
+      break
+    }
+  }
+  if(!ok){
+    return next(new AppError("No document found with that id", 404));
+  }
+  // console.log(path.resolve(`/${__dirname}/../public/assignments${assignment.assignmentPath}`));
+  res.download(path.resolve(`/${__dirname}/../public/materials/${materialPath}`));
+  // res.status(200).json({
+  //   status: "success",
+  // });
+});
+
+exports.deleteMaterial= catchAsync(async (req, res, next) => {
+  console.log(req.params.id)
+  let query = Course.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const course = await query;
+  if (!course) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  let ok=0;
+  let index
+  for(let i=0;i<course.materialsPaths.length;i++){
+    if(course.materialsPaths[i]._id==req.params.id2){
+      ok=1;
+      index=i;
+      break
+    }
+  }
+  if(!ok){
+    return next(new AppError("No document found with that id", 404));
+  }
+  course.materialsPaths.splice(index, 1)
+  console.log(course.materialsPaths)
+  const doc = await Course.findByIdAndUpdate(req.params.id, course, {
+    new: true, //return updated document
+    runValidators: true,
+  });
+  res.status(200).json({
+    status: "success",
   });
 });
