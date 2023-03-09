@@ -18,9 +18,6 @@ const assignmentSchema = new mongoose.Schema({
   assignmentPath:{
     type:String
   },
-  solutions:{
-    type:[{}]
-  },
   instructor: mongoose.Schema.ObjectId
 });
 

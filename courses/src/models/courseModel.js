@@ -38,6 +38,14 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     required: [true, "course must have a full mark"],
   },
+  materialsPaths: [
+    {
+      path: String,
+      name:String,
+      description:String,
+      date: Date,
+    },
+  ],
 });
 
 const Course = mongoose.model("course", courseSchema);

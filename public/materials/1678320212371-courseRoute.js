@@ -19,14 +19,8 @@ router
     courseController.createCourseInstance
   );
   router
-  .route("/original-courses/uploadMaterials")
+  .route("/created-courses/uploadMaterials")
   .patch(protect, courseController.uploadMaterials,courseController.addMaterials);
-  router
-  .route("/original-courses/getMaterials/:id/:id2")
-  .get(courseController.getMaterial)
-  router
-  .route("/original-courses/deleteMaterials/:id/:id2")
-  .get(courseController.deleteMaterial)
 router
   .route("/original-courses/:id")
   .get(protect, restrictTo("system admin"), courseController.getCourse)
