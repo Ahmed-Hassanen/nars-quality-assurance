@@ -5,7 +5,7 @@ const Course = require("../models/courseModel");
 const CourseInstance = require("../models/courseInstanceModel");
 const axios = require("axios");
 const { Kafka } = require("kafkajs");
-const path = require('path');
+const path = require("path");
 const kafka = new Kafka({
   clientId: "my-app",
   brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
@@ -29,29 +29,34 @@ const multerStorage = multer.diskStorage({
   },
 });
 
-const upload = multer({storage: multerStorage});
- 
-exports.addMaterials = catchAsync(async (req, res, next) => {
- if(!req.file){
- return  next(new AppError('there is no file updated',400));
- }
-const course = await Course.findById(req.body.course);
+const upload = multer({ storage: multerStorage });
 
- if(!course){
-  return next(new AppError("No document found with that id", 404));
- }
- course.materialsPaths.push({path:req.file.filename,name:req.body.name,description:req.body.description,date:Date.now()});
- const doc = await Course.findByIdAndUpdate(req.body.course, course, {
-  new: true, //return updated document
-  runValidators: true,
+exports.addMaterials = catchAsync(async (req, res, next) => {
+  if (!req.file) {
+    return next(new AppError("there is no file updated", 400));
+  }
+  const course = await Course.findById(req.body.course);
+
+  if (!course) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  course.materialsPaths.push({
+    path: req.file.filename,
+    name: req.body.name,
+    description: req.body.description,
+    date: Date.now(),
+  });
+  const doc = await Course.findByIdAndUpdate(req.body.course, course, {
+    new: true, //return updated document
+    runValidators: true,
+  });
+  console.log(course.materialsPaths.length, "hhhhhhhhhhhhhhhhhhhhhh");
+  res.status(201).json({
+    status: "success",
+    data: doc,
+  });
 });
- console.log(course.materialsPaths.length,'hhhhhhhhhhhhhhhhhhhhhh')
- res.status(201).json({
-  status: "success",
-  data:doc
-});
-});
-exports.uploadMaterials = upload.single('materialsPaths');
+exports.uploadMaterials = upload.single("materialsPaths");
 exports.createCourseInstance = catchAsync(async (req, res, next) => {
   query = Course.findById(req.body.course);
   const orignalCourse = await query;
@@ -180,7 +185,7 @@ exports.assignCourseInstructor = catchAsync(async (req, res, next) => {
     });
   }
 });
-exports.viewComp=catchAsync(async (req,res,next)=>{
+exports.viewComp = catchAsync(async (req, res, next) => {
   let query = Course.findById(req.params.id);
   const doc = await query;
   const header = `authorization: Bearer ${req.cookies.jwt}`;
@@ -209,7 +214,7 @@ exports.viewComp=catchAsync(async (req,res,next)=>{
         code: 500,
       };
     });
-    const program = await axios
+  const program = await axios
     .get(`http://programs:8080/getProgramSummary/${doc.program}`, {
       headers: header,
     })
@@ -221,46 +226,46 @@ exports.viewComp=catchAsync(async (req,res,next)=>{
         code: 500,
       };
     });
-    res.status(201).json({
-      status: "success",
-      programComp:program.data.competences,
-      facultyComp:faculty.data.competences,
-      departmentComp:department.data.competences
-    });
-
-}
-)
+  res.status(201).json({
+    status: "success",
+    programComp: program.data.competences,
+    facultyComp: faculty.data.competences,
+    departmentComp: department.data.competences,
+  });
+});
 exports.checkComp = catchAsync(async (req, res, next) => {
   let query1 = CourseInstance.findById(req.params.id);
   const doc1 = await query1;
 
-  let query2 = Course.findById(doc1.course).select('-id');
-  const doc2 = await query2
-  console.log(doc2)
-  const comp=req.body.competences;
-  const temp =[];
-  for(let i=0;i<doc2.competences.length;i++){
-    temp[i]={"code":doc2.competences[i].code,"description":doc2.competences[i].description}
+  let query2 = Course.findById(doc1.course).select("-id");
+  const doc2 = await query2;
+  console.log(doc2);
+  const comp = req.body.competences;
+  const temp = [];
+  for (let i = 0; i < doc2.competences.length; i++) {
+    temp[i] = {
+      code: doc2.competences[i].code,
+      description: doc2.competences[i].description,
+    };
   }
   let ok;
-for(let i=0;i<comp.length;i++){
-  ok=0;
-  for(let j=0;j<temp.length;j++){
-    if(comp[i].code==temp[j].code){
-      ok=1;
-      break;
+  for (let i = 0; i < comp.length; i++) {
+    ok = 0;
+    for (let j = 0; j < temp.length; j++) {
+      if (comp[i].code == temp[j].code) {
+        ok = 1;
+        break;
+      }
+    }
+    if (ok == 0) {
+      return next(new AppError("not match the competences", 404));
     }
   }
-  if(ok==0){
-    return next(new AppError("not match the competences", 404));
-  }
-}
-  doc1.approved=true;
+  doc1.approved = true;
   res.status(201).json({
     status: "success",
   });
-}
-)
+});
 exports.sendAssignCourseEvent = catchAsync(async (req, res, next) => {
   const data = {
     courseId: req.body.courseId,
@@ -279,52 +284,68 @@ exports.getMaterial = catchAsync(async (req, res, next) => {
   if (!course) {
     return next(new AppError("No document found with that id", 404));
   }
-  let ok=0;
-  let materialPath
-  for(let i=0;i<course.materialsPaths.length;i++){
-    if(course.materialsPaths[i]._id==req.params.id2){
-      ok=1;
-      materialPath=course.materialsPaths[i].path
-      break
+  let ok = 0;
+  let materialPath;
+  for (let i = 0; i < course.materialsPaths.length; i++) {
+    if (course.materialsPaths[i]._id == req.params.id2) {
+      ok = 1;
+      materialPath = course.materialsPaths[i].path;
+      break;
     }
   }
-  if(!ok){
+  if (!ok) {
     return next(new AppError("No document found with that id", 404));
   }
   // console.log(path.resolve(`/${__dirname}/../public/assignments${assignment.assignmentPath}`));
-  res.download(path.resolve(`/${__dirname}/../public/materials/${materialPath}`));
+  res.download(
+    path.resolve(`/${__dirname}/../public/materials/${materialPath}`)
+  );
   // res.status(200).json({
   //   status: "success",
   // });
 });
 
-exports.deleteMaterial= catchAsync(async (req, res, next) => {
-  console.log(req.params.id)
+exports.deleteMaterial = catchAsync(async (req, res, next) => {
+  console.log(req.params.id);
   let query = Course.findById(req.params.id);
   //if (popOptions) query = query.populate(popOptions);
   const course = await query;
   if (!course) {
     return next(new AppError("No document found with that id", 404));
   }
-  let ok=0;
-  let index
-  for(let i=0;i<course.materialsPaths.length;i++){
-    if(course.materialsPaths[i]._id==req.params.id2){
-      ok=1;
-      index=i;
-      break
+  let ok = 0;
+  let index;
+  for (let i = 0; i < course.materialsPaths.length; i++) {
+    if (course.materialsPaths[i]._id == req.params.id2) {
+      ok = 1;
+      index = i;
+      break;
     }
   }
-  if(!ok){
+  if (!ok) {
     return next(new AppError("No document found with that id", 404));
   }
-  course.materialsPaths.splice(index, 1)
-  console.log(course.materialsPaths)
+  course.materialsPaths.splice(index, 1);
+  console.log(course.materialsPaths);
   const doc = await Course.findByIdAndUpdate(req.params.id, course, {
     new: true, //return updated document
     runValidators: true,
   });
   res.status(200).json({
     status: "success",
+  });
+});
+
+exports.getAllMaterials = catchAsync(async (req, res, next) => {
+  let query = Course.findById(req.params.id);
+  const course = await query;
+  if (!course) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  const Materials = course.materialsPaths;
+  res.status(200).json({
+    status: "success",
+    results: Materials.length,
+    data: Materials,
   });
 });
