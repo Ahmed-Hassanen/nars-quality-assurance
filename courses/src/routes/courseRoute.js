@@ -1,5 +1,6 @@
 const express = require("express");
 const courseController = require("../controllers/courseController");
+const directAssesmentController = require("../controllers/directAssesmentController");
 const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 
@@ -40,6 +41,9 @@ router
   .patch(protect, restrictTo("system admin"), courseController.updateCourse)
   .delete(protect, restrictTo("system admin"), courseController.deleteCourse);
 
+router
+  .route("/created-courses/directAssesments/:id")
+  .post(protect, directAssesmentController.addDirectAssesment);
 router
   .route("/created-courses/:id")
   .get(protect, courseController.getCourseInstance)

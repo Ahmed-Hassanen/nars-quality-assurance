@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const courseInstanceSchema = new mongoose.Schema({
   course: {
     type: mongoose.Schema.ObjectId,
-    ref: "course",
+    ref: 'course',
   },
   courseSpecsPath: String,
   courseReportPath: String,
@@ -28,11 +28,11 @@ const courseInstanceSchema = new mongoose.Schema({
       {
         studentId: {
           type: String,
-          required: [true, "you should specify student id"],
+          required: [true, 'you should specify student id'],
         },
         mark: {
           type: Number,
-          required: [true, "you should specify student mark"],
+          required: [true, 'you should specify student mark'],
         },
       },
     ],
@@ -63,16 +63,16 @@ const courseInstanceSchema = new mongoose.Schema({
               {
                 type: String,
                 enum: [
-                  "face-to-face-lecture",
-                  "online-leacture",
-                  "tutorial-exercise",
-                  "group-discussions",
-                  "laboratory",
-                  "self-reading",
-                  "presentation",
-                  "team-project",
-                  "research-and-reporting",
-                  "brainstorming",
+                  'face-to-face-lecture',
+                  'online-leacture',
+                  'tutorial-exercise',
+                  'group-discussions',
+                  'laboratory',
+                  'self-reading',
+                  'presentation',
+                  'team-project',
+                  'research-and-reporting',
+                  'brainstorming',
                 ],
               },
             ],
@@ -80,16 +80,16 @@ const courseInstanceSchema = new mongoose.Schema({
               {
                 type: String,
                 enum: [
-                  "written-exams",
-                  "online-exams",
-                  "lab-exams",
-                  "pop-quizzes",
-                  "in-class-problem-solving",
-                  "take-home-exam",
-                  "research-assignments",
-                  "reporting-assignments",
-                  "project-assignments",
-                  "in-class-questions",
+                  'written-exams',
+                  'online-exams',
+                  'lab-exams',
+                  'pop-quizzes',
+                  'in-class-problem-solving',
+                  'take-home-exam',
+                  'research-assignments',
+                  'reporting-assignments',
+                  'project-assignments',
+                  'in-class-questions',
                 ],
               },
             ],
@@ -140,15 +140,27 @@ const courseInstanceSchema = new mongoose.Schema({
       courseWebsites: [String],
     },
   },
+  avgCompetences: {
+    type: [
+      {
+        code: {
+          type: String,
+        },
+        avg: {
+          type: Number,
+        },
+      },
+    ],
+  },
 });
 
-courseInstanceSchema.pre("find", function (next) {
-  this.select("-courseSpecs");
+courseInstanceSchema.pre('find', function (next) {
+  this.select('-courseSpecs');
   next();
 });
 
 const CourseInstance = new mongoose.model(
-  "courseInstance",
+  'courseInstance',
   courseInstanceSchema
 );
 
