@@ -4,12 +4,12 @@ const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 
 const router = express.Router();
-router.route("/viewComp/:id").get(protect,courseController.viewComp);
+router.route("/viewComp/:id").get(protect, courseController.viewComp);
 router
   .route("/original-courses")
   .get(protect, courseController.getAllCourses)
   .post(protect, restrictTo("system admin"), courseController.createCourse);
-  router.route("/checkComp/:id").post(protect,courseController.checkComp);
+router.route("/checkComp/:id").post(protect, courseController.checkComp);
 router
   .route("/created-courses")
   .get(protect, courseController.getAllCourseInstances)
@@ -18,15 +18,22 @@ router
     restrictTo("system admin", "instructor"),
     courseController.createCourseInstance
   );
-  router
+router
+  .route("/original-courses/getAllMaterials/:id")
+  .get(courseController.getAllMaterials);
+router
   .route("/original-courses/uploadMaterials")
-  .patch(protect, courseController.uploadMaterials,courseController.addMaterials);
-  router
+  .patch(
+    protect,
+    courseController.uploadMaterials,
+    courseController.addMaterials
+  );
+router
   .route("/original-courses/getMaterials/:id/:id2")
-  .get(courseController.getMaterial)
-  router
+  .get(courseController.getMaterial);
+router
   .route("/original-courses/deleteMaterials/:id/:id2")
-  .get(courseController.deleteMaterial)
+  .get(courseController.deleteMaterial);
 router
   .route("/original-courses/:id")
   .get(protect, restrictTo("system admin"), courseController.getCourse)
