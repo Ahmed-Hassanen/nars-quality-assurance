@@ -9,14 +9,13 @@ router.route("/viewComp/:id").get(protect, courseController.viewComp);
 router
   .route("/original-courses")
   .get(protect, courseController.getAllCourses)
-  .post(protect, restrictTo("system admin"), courseController.createCourse);
+  .post(protect, courseController.createCourse);
 router.route("/checkComp/:id").post(protect, courseController.checkComp);
 router
   .route("/created-courses")
   .get(protect, courseController.getAllCourseInstances)
   .post(
     protect,
-    restrictTo("system admin", "instructor"),
     courseController.createCourseInstance
   );
 router
@@ -37,9 +36,9 @@ router
   .get(courseController.deleteMaterial);
 router
   .route("/original-courses/:id")
-  .get(protect, restrictTo("system admin"), courseController.getCourse)
-  .patch(protect, restrictTo("system admin"), courseController.updateCourse)
-  .delete(protect, restrictTo("system admin"), courseController.deleteCourse);
+  .get(protect, courseController.getCourse)
+  .patch(protect,courseController.updateCourse)
+  .delete(protect,courseController.deleteCourse);
 
 router
   .route("/created-courses/directAssesments/:id")
@@ -53,7 +52,6 @@ router
   .route("/assign-course-instructor")
   .patch(
     protect,
-    restrictTo("system admin"),
     courseController.assignCourseInstructor
   );
 
