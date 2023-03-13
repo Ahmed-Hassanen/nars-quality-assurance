@@ -1,26 +1,26 @@
-const catchAsync = require('../shared/utils/catchAsync');
-const factory = require('./../shared/controllers/handlerFactory');
-const AppError = require('./../shared/utils/appError');
-const path = require('path');
-const CourseInstance = require('../models/courseInstanceModel');
-const Course = require('../models/courseModel');
+const catchAsync = require("../shared/utils/catchAsync");
+const factory = require("./../shared/controllers/handlerFactory");
+const AppError = require("./../shared/utils/appError");
+const path = require("path");
+const CourseInstance = require("../models/courseInstanceModel");
+const Course = require("../models/courseModel");
 exports.addDirectAssesment = catchAsync(async (req, res, next) => {
   let query = CourseInstance.findById(req.params.id);
   //if (popOptions) query = query.populate(popOptions);
   const courseInstance = await query;
 
   if (!courseInstance) {
-    return next(new AppError('No courseInstance found with that id', 404));
+    return next(new AppError("No courseInstance found with that id", 404));
   }
   query = Course.findById(courseInstance.course);
   //if (popOptions) query = query.populate(popOptions);
   const course = await query;
 
   if (!course) {
-    return next(new AppError('No orignal course found with that id', 404));
+    return next(new AppError("No orignal course found with that id", 404));
   }
   if (!req.body.questions) {
-    return next(new AppError('you should enter questions', 400));
+    return next(new AppError("you should enter questions", 400));
   }
   const avgCompetences = [];
   let avg;
@@ -53,7 +53,7 @@ exports.addDirectAssesment = catchAsync(async (req, res, next) => {
     }
   );
   res.status(201).json({
-    status: 'success',
+    status: "success",
     avgCompetences,
   });
 });

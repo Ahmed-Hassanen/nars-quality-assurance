@@ -39,12 +39,20 @@ router
 
 router
   .route("/students/updateMe")
-  .patch(authController.protect,studentController.uploadUserPhoto,studentController.updateMe);
+  .patch(
+    authController.protect,
+    studentController.uploadUserPhoto,
+    studentController.updateMe
+  );
 
 //Staff
 router
   .route("/staff/updateMe")
-  .patch(authController.protect,staffController.uploadUserPhoto,staffController.updateMe);
+  .patch(
+    authController.protect,
+    staffController.uploadUserPhoto,
+    staffController.updateMe
+  );
 router
   .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
@@ -62,20 +70,12 @@ router
 
 router
   .route("/staff/update-staff-courses")
-  .patch(
-    authController.protect,
-    authController.restrictTo("system admin", "instructor"),
-    staffController.updateStaffCourses
-  );
+  .patch(authController.protect, staffController.updateStaffCourses);
 
 router
   .route("/staff/:id")
   .get(authController.protect, staffController.getStaff)
-  .patch(
-    authController.protect,
-    authController.restrictTo("system admin", "instructor"),
-    staffController.updateStaff
-  )
+  .patch(authController.protect, staffController.updateStaff)
   .delete(
     authController.protect,
     authController.restrictTo("system admin"),
