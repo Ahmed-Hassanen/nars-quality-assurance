@@ -1,10 +1,11 @@
 const Staff = require("../models/staffModel");
 const factory = require("./../shared/controllers/handlerFactory");
+const jwt = require("jsonwebtoken");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
 const multer = require("multer");
 const { Kafka } = require("kafkajs");
-
+const path = require("path");
 const kafka = new Kafka({
   clientId: "my-app",
   brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
@@ -16,6 +17,33 @@ exports.deleteStaff = factory.deleteOne(Staff);
 exports.updateStaff = factory.updateOne(Staff);
 exports.getStaff = factory.getOne(Staff);
 exports.createStaff = factory.createOne(Staff);
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.EXPIRES_IN,
+  });
+};
+const createSendToken = (user, statusCode, req, res) => {
+  const token = signToken(user._id);
+
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  });
+
+  // Remove password from output
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -65,10 +93,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.file) filteredBody.photo = req.file.filename;
 
   // 3) Update user document
-  const updatedUser = await Staff.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedUser = await Staff.findByIdAndUpdate(
+    req.params.id,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   res.status(200).json({
     status: "success",
@@ -121,6 +153,36 @@ exports.updateStaffCourses = catchAsync(async (req, res, next) => {
       staff: updatedStaff,
     });
   }
+});
+exports.getStaffPhoto = catchAsync(async (req, res, next) => {
+  let query = Staff.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const staff = await query;
+
+  if (!staff) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  res.download(path.resolve(`/${__dirname}/../public/photos/${staff.photo}`));
+});
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const staff = await Staff.findById(req.params.id).select("+password");
+
+  // 2) Check if POSTed current password is correct
+  if (
+    !(await staff.correctPassword(req.body.passwordCurrent, staff.password))
+  ) {
+    return next(new AppError("Your current password is wrong.", 401));
+  }
+
+  // 3) If so, update password
+  staff.password = req.body.password;
+  staff.passwordConfirm = req.body.passwordConfirm;
+  await staff.save();
+  // User.findByIdAndUpdate will NOT work as intended!
+
+  // 4) Log user in, send JWT
+  createSendToken(staff, 200, req, res);
 });
 
 updateCourseInstructorConsumer = async () => {

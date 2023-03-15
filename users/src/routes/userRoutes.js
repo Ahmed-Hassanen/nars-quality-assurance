@@ -38,21 +38,33 @@ router
   );
 
 router
-  .route("/students/updateMe")
+  .route("/students/updateMe/:id")
   .patch(
     authController.protect,
     studentController.uploadUserPhoto,
     studentController.updateMe
   );
+router
+  .route("/students/getPhoto/:id")
+  .get(authController.protect, studentController.getStudentPhoto);
+router
+  .route("/students/updatePassword/:id")
+  .patch(authController.protect, studentController.updatePassword);
 
 //Staff
 router
-  .route("/staff/updateMe")
+  .route("/staff/updateMe/:id")
   .patch(
     authController.protect,
     staffController.uploadUserPhoto,
     staffController.updateMe
   );
+router
+  .route("/staff/updatePassword/:id")
+  .patch(authController.protect, staffController.updatePassword);
+router
+  .route("/staff/getPhoto/:id")
+  .get(authController.protect, staffController.getStaffPhoto);
 router
   .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
