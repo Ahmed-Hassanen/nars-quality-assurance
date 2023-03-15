@@ -94,6 +94,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
         code: 500,
       };
     });
+  console.log(studentsData.data);
   if (studentsData.status === false) {
     return next(new AppError(studentsData.message, studentsData.code));
   }
