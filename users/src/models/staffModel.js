@@ -64,9 +64,9 @@ const staffSchema = new mongoose.Schema({
     type: String,
   },
   courses: [mongoose.Schema.ObjectId],
-  programs: [String],
-  faculty: String,
-  deparments: [String],
+  program: ObjectId,
+  faculty: ObjectId,
+  deparment: ObjectId,
   phoneNumber: String,
 });
 
