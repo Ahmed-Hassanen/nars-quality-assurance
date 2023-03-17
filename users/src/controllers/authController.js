@@ -356,3 +356,43 @@ exports.restrictRequest = catchAsync(async (req, res, next) => {
     status: true,
   });
 });
+
+exports.userToken = catchAsync(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) {
+    return next(new AppError("no token found", 401));
+  }
+
+  const decoded = await promisify(JWT.verify)(token, process.env.JWT_SECRET);
+
+  const staffUser = await Staff.findById(decoded.id);
+  const studentUser = await Student.findById(decoded.id);
+  if (!staffUser && !studentUser) {
+    return next(
+      new AppError(
+        "The user belonging to this token does no longer exist.",
+        401
+      )
+    );
+  }
+  const currentUser = staffUser ? staffUser : studentUser;
+
+  if (currentUser.chagesPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("user recently changed password please log in again", 401)
+    );
+  }
+  res.status(200).json({
+    status: "success",
+    data: currentUser,
+  });
+});
