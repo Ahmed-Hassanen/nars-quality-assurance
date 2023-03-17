@@ -152,6 +152,7 @@ const courseInstanceSchema = new mongoose.Schema({
       },
     ],
   },
+  courseSpecsPath: String,
 });
 
 courseInstanceSchema.pre(/^findOne/, function (next) {

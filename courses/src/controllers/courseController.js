@@ -439,3 +439,64 @@ exports.getAllMaterials = catchAsync(async (req, res, next) => {
     data: Materials,
   });
 });
+const multerSpcsPdf = require("multer");
+const multerStorageSpcsPdf = multerSpcsPdf.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/courseSpcs/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const uploadSpcsPdf = multerSpcsPdf({ storage: multerStorageSpcsPdf });
+exports.uploadSpcsPdf = uploadSpcsPdf.single("courseSpcs");
+
+exports.addSpcsPdf = catchAsync(async (req, res, next) => {
+  console.log(__dirname);
+  if (!req.file) return next(new AppError("there is no file", 400));
+
+  const courseinstance = await CourseInstance.findByIdAndUpdate(
+    req.body.courseInstance,
+    { courseSpecsPath: `${req.file.filename}` },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+  if (!courseinstance) {
+    return next(new AppError("No courseinstance found with that id", 404));
+  }
+  res.status(201).json({
+    status: "success",
+
+    data: courseinstance,
+  });
+});
+
+exports.getSpecsPdf = catchAsync(async (req, res, next) => {
+  let query = CourseInstance.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const courseinstance = await query;
+
+  if (!courseinstance) {
+    return next(new AppError("No courseinstance found with that id", 404));
+  }
+  console.log("hereeeeeeeeeeeeee");
+  console.log(
+    path.resolve(
+      `/${__dirname}/../public/courseSpcs/${courseinstance.courseSpecsPath}`
+    )
+  );
+  res.download(
+    path.resolve(
+      `/${__dirname}/../public/courseSpcs/${courseinstance.courseSpecsPath}`
+    )
+  );
+  // res.send();
+  // res.status(200).json({
+  //   status: "success",
+
+  //   data: exam,
+  // });
+});
