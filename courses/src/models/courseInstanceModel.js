@@ -23,6 +23,10 @@ const courseInstanceSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  courseSpecsCompleted: {
+    type: Boolean,
+    default: false,
+  },
   marks: {
     type: [
       {
@@ -171,7 +175,7 @@ const courseInstanceSchema = new mongoose.Schema({
   },
 });
 
-courseInstanceSchema.pre(/^findOne/, function (next) {
+courseInstanceSchema.pre(/^find/, function (next) {
   this.populate({ path: "course", select: "-__v -questions" });
 
   next();

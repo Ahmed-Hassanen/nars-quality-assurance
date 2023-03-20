@@ -207,11 +207,13 @@ exports.updateCourseInstance = catchAsync(async (req, res, next) => {
   if (studentAssessment) {
     course.courseSpecs.studentAssessment = studentAssessment;
   }
-  if (facilities) {
-    course.courseSpecs.facilities = facilities;
-  }
   if (references) {
     course.courseSpecs.references = references;
+  }
+  //facilities is the last page so receiving it means the course specs is completed
+  if (facilities) {
+    course.courseSpecs.facilities = facilities;
+    course.courseSpecsCompleted = true;
   }
 
   const updatedCourse = await course.save();
