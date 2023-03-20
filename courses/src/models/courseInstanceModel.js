@@ -140,19 +140,35 @@ const courseInstanceSchema = new mongoose.Schema({
       courseWebsites: [String],
     },
   },
-  avgCompetences: {
-    type: [
-      {
-        code: {
-          type: String,
-        },
-        avg: {
-          type: Number,
-        },
-      },
-    ],
-  },
+
   courseSpecsPath: String,
+  report: {
+    questions: {
+      type: [
+        {
+          type: {
+            type: String,
+            enum: ["final", "quiz", "mid"],
+          },
+          grades: [Number],
+          fullMark: Number,
+          competences: [String],
+        },
+      ],
+    },
+    avgCompetences: {
+      type: [
+        {
+          code: {
+            type: String,
+          },
+          avg: {
+            type: Number,
+          },
+        },
+      ],
+    },
+  },
 });
 
 courseInstanceSchema.pre(/^findOne/, function (next) {
