@@ -148,7 +148,7 @@ const courseInstanceSchema = new mongoose.Schema({
         {
           type: {
             type: String,
-            enum: ["final", "quiz", "mid"],
+            enum: ["final", "quiz", "midterm"],
           },
           grades: [Number],
           fullMark: Number,
