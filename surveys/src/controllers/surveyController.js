@@ -23,6 +23,15 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
     survey: surveyId,
     studentId: studentId,
   });
+  const survey = await Survey.findById(surveyId);
+
+  //check if dueTo Date is passed or not
+  const currentDate = Date.now();
+  if (survey.dueTo && currentDate > survey.dueTo) {
+    return next(
+      new AppError("This survey is over, you can't add any submission", 400)
+    );
+  }
 
   //check if the submission is already there
   if (surveySubmissions.length == 0) {

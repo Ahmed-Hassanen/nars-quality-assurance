@@ -1,14 +1,13 @@
 const express = require("express");
 const surveyController = require("../controllers/surveyController");
 const { protect } = require("../shared/middlewares/protectMiddleware");
-const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 
 const router = express.Router();
 
 router
   .route("/")
   .get(protect, surveyController.getAllSurveys)
-  .post(protect, restrictTo("system admin"), surveyController.addSurvey);
+  .post(protect, surveyController.addSurvey);
 
 router
   .route("/submissions/")
@@ -22,7 +21,7 @@ router
 router
   .route("/:id")
   .get(protect, surveyController.getSurveyById)
-  .delete(protect, restrictTo("system admin"), surveyController.deleteSurvey);
+  .delete(protect, surveyController.deleteSurvey);
 
 router
   .route("/submissions/:id")
