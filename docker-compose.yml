@@ -56,7 +56,7 @@ services:
   users:
     container_name: users
     build: ./users
-    image: mohamedsalama118/users
+    # image: mohamedsalama118/users
     ports:
       - 8081:8080
     volumes:
@@ -76,32 +76,32 @@ services:
       - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
     depends_on:
       - user_db
-  competences:
-    container_name: competences
-    build: ./competences
-    image: mohamedsalama118/competences
-    ports:
-      - 8085:8080
-    volumes:
-      - ./competences/src:/competences/src
-      - ./shared/utils:/competences/src/shared/utils
-      - ./shared/controllers:/competences/src/shared/controllers
-    environment:
-      - NODE_ENV=development
-      - PORT=8080
-      - MONGO_URL=mongodb://competences_db:27017/competences
-      - EMAIL=nars-qa@outlook.com
-      - EMAIL_PASSWORD=NARSsystem
-      - EXPIRES_IN=90d
-      - JWT_COOKIE_EXPIRES_IN=90
-      - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
-    depends_on:
-      - faculty_db
+  # competences:
+  #   container_name: competences
+  #   build: ./competences
+  #   image: mohamedsalama118/competences
+  #   ports:
+  #     - 8085:8080
+  #   volumes:
+  #     - ./competences/src:/competences/src
+  #     - ./shared/utils:/competences/src/shared/utils
+  #     - ./shared/controllers:/competences/src/shared/controllers
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=8080
+  #     - MONGO_URL=mongodb://competences_db:27017/competences
+  #     - EMAIL=nars-qa@outlook.com
+  #     - EMAIL_PASSWORD=NARSsystem
+  #     - EXPIRES_IN=90d
+  #     - JWT_COOKIE_EXPIRES_IN=90
+  #     - JWT_SECRET=MY-JWT_SECRET-for-nodejs-and-express-and-mongodb
+  #   depends_on:
+  #     - faculty_db
 
   programs:
     container_name: programs
     build: ./programs
-    image: mohamedsalama118/programs
+    # image: mohamedsalama118/programs
     ports:
       - 8086:8080
     volumes:
@@ -130,7 +130,7 @@ services:
   faculty:
     container_name: faculty
     build: ./faculty
-    image: mohamedsalama118/faculty
+    # image: mohamedsalama118/faculty
     ports:
       - 8083:8080
     volumes:
@@ -161,7 +161,7 @@ services:
   department:
     container_name: department
     build: ./department
-    image: mohamedsalama118/department
+    # image: mohamedsalama118/department
     ports:
       - 8084:8080
     volumes:
@@ -182,7 +182,7 @@ services:
   surveys:
     container_name: surveys
     build: ./surveys
-    image: mohamedsalama118/surveys
+    # image: mohamedsalama118/surveys
     ports:
       - 8082:8080
     volumes:
@@ -204,7 +204,7 @@ services:
   courses:
     container_name: courses
     build: ./courses
-    image: mohamedsalama118/courses
+    # image: mohamedsalama118/courses
     ports:
       - 8087:8080
     volumes:
@@ -216,6 +216,7 @@ services:
       - ./public/exams:/courses/src/public/exams
       - ./public/assignments:/courses/src/public/assignments
       - ./public/assignmentSolutions:/courses/src/public/assignmentSolutions
+      - ./public/courseSpcs:/courses/src/public/courseSpcs
     environment:
       - NODE_ENV=development
       - PORT=8080

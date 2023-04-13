@@ -1,12 +1,81 @@
 const Student = require("../models/studentModel");
+const CourseInstance = require("../models/studentModel");
+const jwt = require("jsonwebtoken");
 const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
 const AppError = require("./../shared/utils/appError");
-
+const path = require("path");
 const multer = require("multer");
 const { exists } = require("../models/studentModel");
 const axios = require("axios");
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.EXPIRES_IN,
+  });
+};
+const createSendToken = (user, statusCode, req, res) => {
+  const token = signToken(user._id);
 
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  });
+
+  // Remove password from output
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+exports.getCourses = catchAsync(async (req, res, next) => {
+  let query = Student.findById(req.params.id);
+  const student = await query;
+  const courses = student.courses;
+  const passedCourses = student.passedCourses;
+  const generalcourses = [];
+  for (let i = 0; i < courses.length; i++) {
+    let passed = false;
+    const header = `authorization: Bearer ${req.cookies.jwt}`;
+
+    const course = await axios
+      .get(`http://courses:8080/created-courses/${courses[i]}`, {
+        headers: header,
+      })
+      .then((res) => res.data)
+      .catch((e) => {
+        return {
+          status: false,
+          message: "something went wrong",
+          code: 500,
+        };
+      });
+    if (course.status === false) {
+      return next(new AppError(faculty.message, faculty.code));
+    }
+    for (let j = 0; j < passedCourses.length; j++) {
+      console.log(course.data.course._id);
+      console.log(passedCourses[j]);
+      if (course.data.course._id == passedCourses[j]) {
+        passed = true;
+        break;
+      }
+    }
+    generalcourses.push({ course: course.data.course._id, passed });
+  }
+  res.status(201).json({
+    status: "success",
+
+    courses: generalcourses,
+  });
+});
 exports.getStudent = factory.getOne(Student);
 exports.getAllStudents = factory.getAll(Student);
 exports.updateStudent = factory.updateOne(Student);
@@ -79,14 +148,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // 3) Update user document
   const updatedUser = await Student.findByIdAndUpdate(
-    req.user.id,
+    req.params.id,
     filteredBody,
     {
       new: true,
       runValidators: true,
     }
   );
-
+  console.log(updatedUser);
   res.status(200).json({
     status: "success",
     data: updatedUser,
@@ -128,4 +197,38 @@ exports.addPassedCourses = catchAsync(async (req, res, next) => {
 
     data: doc,
   });
+});
+
+exports.getStudentPhoto = catchAsync(async (req, res, next) => {
+  let query = Student.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const student = await query;
+
+  if (!student) {
+    return next(new AppError("No document found with that id", 404));
+  }
+  console.log("heeeeeeeeeeeeere");
+  console.log(path.resolve(`/${__dirname}/../public/photos/${student.photo}`));
+  res.download(path.resolve(`/${__dirname}/../public/photos/${student.photo}`));
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  const student = await Student.findById(req.params.id).select("+password");
+
+  // 2) Check if POSTed current password is correct
+  if (
+    !(await student.correctPassword(req.body.passwordCurrent, student.password))
+  ) {
+    return next(new AppError("Your current password is wrong.", 401));
+  }
+
+  // 3) If so, update password
+  student.password = req.body.password;
+  student.passwordConfirm = req.body.passwordConfirm;
+  await student.save();
+  // User.findByIdAndUpdate will NOT work as intended!
+
+  // 4) Log user in, send JWT
+  createSendToken(student, 200, req, res);
 });

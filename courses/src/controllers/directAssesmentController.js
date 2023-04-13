@@ -44,9 +44,14 @@ exports.addDirectAssesment = catchAsync(async (req, res, next) => {
     // competences[competency].avg = avg;
     avgCompetences.push({ code: competency.code, avg: avg });
   });
+  const report = {
+    questions: req.body.questions,
+    avgCompetences,
+  };
+  console.log(report);
   const doc = await CourseInstance.findByIdAndUpdate(
     req.params.id,
-    { avgCompetences: avgCompetences },
+    { report },
     {
       new: true, //return updated document
       runValidators: true,
@@ -54,6 +59,6 @@ exports.addDirectAssesment = catchAsync(async (req, res, next) => {
   );
   res.status(201).json({
     status: "success",
-    avgCompetences,
+    data: doc.report,
   });
 });

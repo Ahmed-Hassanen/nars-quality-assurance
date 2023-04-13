@@ -23,6 +23,10 @@ const courseInstanceSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  courseSpecsCompleted: {
+    type: Boolean,
+    default: false,
+  },
   marks: {
     type: [
       {
@@ -140,21 +144,38 @@ const courseInstanceSchema = new mongoose.Schema({
       courseWebsites: [String],
     },
   },
-  avgCompetences: {
-    type: [
-      {
-        code: {
-          type: String,
+
+  courseSpecsPath: String,
+  report: {
+    questions: {
+      type: [
+        {
+          type: {
+            type: String,
+            enum: ["final", "quiz", "midterm"],
+          },
+          grades: [Number],
+          fullMark: Number,
+          competences: [String],
         },
-        avg: {
-          type: Number,
+      ],
+    },
+    avgCompetences: {
+      type: [
+        {
+          code: {
+            type: String,
+          },
+          avg: {
+            type: Number,
+          },
         },
-      },
-    ],
+      ],
+    },
   },
 });
 
-courseInstanceSchema.pre(/^findOne/, function (next) {
+courseInstanceSchema.pre(/^find/, function (next) {
   this.populate({ path: "course", select: "-__v -questions" });
 
   next();

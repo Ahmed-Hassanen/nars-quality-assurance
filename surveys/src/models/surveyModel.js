@@ -21,6 +21,14 @@ const surveySchema = new mongoose.Schema({
     ],
     required: [true, "Survey must have questions"],
   },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  dueTo: {
+    type: Date,
+    required: [true, "Survey must have a due-to date"],
+  },
   courseId: mongoose.Schema.ObjectId,
   programId: mongoose.Schema.ObjectId,
 });

@@ -5,6 +5,12 @@ const { protect } = require("../shared/middlewares/protectMiddleware");
 const { restrictTo } = require("../shared/middlewares/restrictMiddleware");
 
 const router = express.Router();
+
+router
+  .route("/specsPdf")
+  .post(courseController.uploadSpcsPdf, courseController.addSpcsPdf);
+router.route("/specsPdf/:id").get(courseController.getSpecsPdf);
+
 router.route("/viewComp/:id").get(protect, courseController.viewComp);
 router
   .route("/original-courses")
@@ -14,10 +20,7 @@ router.route("/checkComp/:id").post(protect, courseController.checkComp);
 router
   .route("/created-courses")
   .get(protect, courseController.getAllCourseInstances)
-  .post(
-    protect,
-    courseController.createCourseInstance
-  );
+  .post(protect, courseController.createCourseInstance);
 router
   .route("/original-courses/getAllMaterials/:id")
   .get(courseController.getAllMaterials);
@@ -37,8 +40,8 @@ router
 router
   .route("/original-courses/:id")
   .get(protect, courseController.getCourse)
-  .patch(protect,courseController.updateCourse)
-  .delete(protect,courseController.deleteCourse);
+  .patch(protect, courseController.updateCourse)
+  .delete(protect, courseController.deleteCourse);
 
 router
   .route("/created-courses/directAssesments/:id")
@@ -50,9 +53,6 @@ router
 
 router
   .route("/assign-course-instructor")
-  .patch(
-    protect,
-    courseController.assignCourseInstructor
-  );
+  .patch(protect, courseController.assignCourseInstructor);
 
 module.exports = router;
