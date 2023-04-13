@@ -11,6 +11,47 @@ exports.getStudent = factory.getOne(Student);
 exports.getAllStudents = factory.getAll(Student);
 exports.updateStudent = factory.updateOne(Student);
 exports.deleteStudent = factory.deleteOne(Student);
+exports.getCourses = catchAsync(async (req, res, next) => {
+  let query = Student.findById(req.params.id);
+  const student = await query;
+  const courses = student.courses;
+  const passedCourses = student.passedCourses;
+  const generalcourses = [];
+  for (let i = 0; i < courses.length; i++) {
+    let passed = false;
+    const header = `authorization: Bearer ${req.cookies.jwt}`;
+
+    const course = await axios
+      .get(`http://courses:8080/created-courses/${courses[i]}`, {
+        headers: header,
+      })
+      .then((res) => res.data)
+      .catch((e) => {
+        return {
+          status: false,
+          message: "something went wrong",
+          code: 500,
+        };
+      });
+    if (course.status === false) {
+      return next(new AppError(faculty.message, faculty.code));
+    }
+    for (let j = 0; j < passedCourses.length; j++) {
+      console.log(course.data.course._id);
+      console.log(passedCourses[j]);
+      if (course.data.course._id == passedCourses[j]) {
+        passed = true;
+        break;
+      }
+    }
+    generalcourses.push({ course: course.data.course._id, passed });
+  }
+  res.status(201).json({
+    status: "success",
+
+    courses: generalcourses,
+  });
+});
 exports.createStudent = catchAsync(async (req, res, next) => {
   const header = `authorization: Bearer ${req.cookies.jwt}`;
 

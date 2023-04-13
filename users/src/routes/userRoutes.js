@@ -22,7 +22,9 @@ router
     authController.restrictTo("system admin"),
     studentController.createStudent
   );
-
+router
+  .route("/students/getCourses/:id")
+  .get(authController.protect, studentController.getCourses);
 router
   .route("/students/:id")
   .get(authController.protect, studentController.getStudent)
