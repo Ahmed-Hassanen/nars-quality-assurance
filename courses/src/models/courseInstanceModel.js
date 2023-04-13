@@ -49,8 +49,10 @@ const courseInstanceSchema = new mongoose.Schema({
   courseSpecs: {
     courseData: {
       lectures: Number,
-      contactHourse: Number,
+      contactHours: Number,
       specialization: String,
+      semester: String,
+      practice: String,
     },
     courseAims: String,
     courseContent: String,
@@ -68,7 +70,7 @@ const courseInstanceSchema = new mongoose.Schema({
                 type: String,
                 enum: [
                   "face-to-face-lecture",
-                  "online-leacture",
+                  "online-lecture",
                   "tutorial-exercise",
                   "group-discussions",
                   "laboratory",
@@ -101,8 +103,8 @@ const courseInstanceSchema = new mongoose.Schema({
         ],
       },
     ],
-    leacturePlan: {
-      expectedStudyingHoursePerWeek: Number,
+    lecturePlan: {
+      expectedStudyingHoursPerWeek: Number,
       topics: [
         {
           week: Number,
@@ -139,7 +141,7 @@ const courseInstanceSchema = new mongoose.Schema({
     facilities: [String],
     references: {
       courseNotes: String,
-      bookes: [String],
+      books: [String],
       recommendedBooks: [String],
       courseWebsites: [String],
     },
