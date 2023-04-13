@@ -1,5 +1,4 @@
 const Student = require("../models/studentModel");
-const CourseInstance = require("../models/studentModel");
 const jwt = require("jsonwebtoken");
 const factory = require("./../shared/controllers/handlerFactory");
 const catchAsync = require("./../shared/utils/catchAsync");
