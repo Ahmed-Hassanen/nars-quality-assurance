@@ -3,10 +3,45 @@ const Sumbission = require("../models/submissionModel");
 const catchAsync = require("../shared/utils/catchAsync");
 const factory = require("./../shared/controllers/handlerFactory");
 const AppError = require("./../shared/utils/appError");
+const axios = require("axios");
 
 //Surveys
 exports.getAllSurveys = factory.getAll(Survey);
-exports.addSurvey = factory.createOne(Survey);
+exports.addSurvey = catchAsync(async (req, res, next) => {
+  if (!req.body.courseInstance) {
+    return next(new AppError("Survey must belong to course instance", 400));
+  }
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const courseInstance = await axios
+    .get(`http://courses:8080/created-courses/${req.body.courseInstance}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (courseInstance.status === "fail") {
+    return next(new AppError(courseInstance.message, courseInstance.code));
+  }
+  req.body.questions =
+    courseInstance.data.courseSpecs.courseLearningOutcomes.map(
+      (lo) => lo.title
+    );
+  console.log(req.body.questions);
+  const doc = await Survey.create(req.body);
+  res.status(201).json({
+    status: "success",
+
+    data: doc,
+  });
+});
 exports.deleteSurvey = factory.deleteOne(Survey);
 exports.getSurveyById = factory.getOne(Survey);
 
