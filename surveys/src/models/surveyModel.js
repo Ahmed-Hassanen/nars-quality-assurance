@@ -6,21 +6,7 @@ const surveySchema = new mongoose.Schema({
     required: [true, "Survey must have a name"],
   },
   description: String,
-  questions: {
-    type: [
-      {
-        question: {
-          type: String,
-          required: [true, "Question must have a question"],
-        },
-        possibleAnswers: {
-          type: [String],
-          require: [true, "Question must have answers"],
-        },
-      },
-    ],
-    required: [true, "Survey must have questions"],
-  },
+  questions: [String],
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -29,7 +15,10 @@ const surveySchema = new mongoose.Schema({
     type: Date,
     required: [true, "Survey must have a due-to date"],
   },
-  courseId: mongoose.Schema.ObjectId,
+  courseInstance: {
+    type: mongoose.Schema.ObjectId,
+    required: [true, "Survey must belong to course instance"],
+  },
   programId: mongoose.Schema.ObjectId,
 });
 
