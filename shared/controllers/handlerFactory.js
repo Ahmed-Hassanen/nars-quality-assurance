@@ -63,7 +63,7 @@ exports.getOne = (Model, popOptions) =>
 
 exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
-    let filter = {};
+    let filter = { roles: { $ne: "system admin" } };
     //filtering for the system adming
     if (req.params.role) filter = { role: req.params.role };
 
