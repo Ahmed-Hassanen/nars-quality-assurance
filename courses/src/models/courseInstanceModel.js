@@ -109,6 +109,10 @@ const courseInstanceSchema = new mongoose.Schema({
         {
           week: Number,
           topics: [String],
+          achieved: {
+            type: Boolean,
+            default: true,
+          },
           plannedHours: Number,
           learningOutcomes: [
             {
