@@ -16,21 +16,21 @@ const courseSchema = new mongoose.Schema({
     required: [true, "course must belong to ademic year"],
   },
   program: mongoose.Schema.ObjectId,
-  competences:{
-    type:[
-        {
-    code:{
-     type:String,
-    required: [true, "program must have a code"],
-         },
-    description:{
-    type:String,
-    required: [true, "program must have a description"],
-               }
-    }
-       ],
+  competences: {
+    type: [
+      {
+        code: {
+          type: String,
+          required: [true, "program must have a code"],
+        },
+        description: {
+          type: String,
+          required: [true, "program must have a description"],
+        },
+      },
+    ],
     required: [true, "Competences must have a description"],
-},
+  },
   department: mongoose.Schema.ObjectId,
   faculty: mongoose.Schema.ObjectId,
   exams: [mongoose.Schema.ObjectId],
@@ -41,11 +41,15 @@ const courseSchema = new mongoose.Schema({
   materialsPaths: [
     {
       path: String,
-      name:String,
-      description:String,
+      name: String,
+      description: String,
       date: Date,
     },
   ],
+  target: {
+    type: Number,
+    default: 50,
+  },
 });
 
 const Course = mongoose.model("course", courseSchema);

@@ -71,11 +71,7 @@ router
 router
   .route("/staff")
   .get(authController.protect, staffController.getAllStaffMembers)
-  .post(
-    authController.protect,
-    authController.restrictTo("system admin"),
-    staffController.createStaff
-  );
+  .post(authController.protect, staffController.createStaff);
 
 router.route("/addSystemAdmin").post(staffController.createStaff);
 
@@ -86,6 +82,11 @@ router
 router
   .route("/staff/update-staff-courses")
   .patch(authController.protect, staffController.updateStaffCourses);
+
+router
+  .route("/staff/role/:id")
+  .patch(authController.protect, staffController.addStaffRole)
+  .delete(authController.protect, staffController.deleteStaffRole);
 
 router
   .route("/staff/:id")

@@ -35,8 +35,8 @@ const staffSchema = new mongoose.Schema({
     type: String,
     default: "default.jpg",
   },
-  role: {
-    type: String,
+  roles: {
+    type: [String],
     enum: [
       "instructor",
       "quality coordinator",

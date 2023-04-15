@@ -200,3 +200,54 @@ updateCourseInstructorConsumer = async () => {
 };
 
 updateCourseInstructorConsumer().catch(console.log);
+
+exports.addStaffRole = catchAsync(async (req, res, next) => {
+  if (!req.body.roles) {
+    return next(new AppError("you should choose role", 404));
+  }
+  const doc = await Staff.findByIdAndUpdate(
+    req.params.id,
+    { $push: { roles: req.body.roles } },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!doc) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+
+    data: doc,
+  });
+});
+exports.deleteStaffRole = catchAsync(async (req, res, next) => {
+  if (!req.body.roles) {
+    return next(new AppError("you should choose role", 404));
+  }
+  const doc = await Staff.findByIdAndUpdate(
+    req.params.id,
+    {
+      $pullAll: {
+        roles: req.body.roles,
+      },
+    },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!doc) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+
+    data: doc,
+  });
+});
