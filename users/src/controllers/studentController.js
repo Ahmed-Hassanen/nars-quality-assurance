@@ -71,7 +71,7 @@ exports.getCourses = catchAsync(async (req, res, next) => {
         break;
       }
     }
-    generalcourses.push({ course: course.data.course._id, passed });
+    generalcourses.push({ course: course.data, passed });
   }
   res.status(201).json({
     status: "success",
