@@ -181,7 +181,7 @@ exports.updateCourseInstance = catchAsync(async (req, res, next) => {
   const studentAcademicCounselingSupport =
     req.body.courseSpecs.studentAcademicCounselingSupport;
   const courseLearningOutcomes = req.body.courseSpecs.courseLearningOutcomes;
-  const leacturePlan = req.body.courseSpecs.leacturePlan;
+  const lecturePlan = req.body.courseSpecs.lecturePlan;
   const studentAssessment = req.body.courseSpecs.studentAssessment;
   const facilities = req.body.courseSpecs.facilities;
   const references = req.body.courseSpecs.references;
@@ -201,8 +201,8 @@ exports.updateCourseInstance = catchAsync(async (req, res, next) => {
   if (courseLearningOutcomes) {
     course.courseSpecs.courseLearningOutcomes = courseLearningOutcomes;
   }
-  if (leacturePlan) {
-    course.courseSpecs.leacturePlan = leacturePlan;
+  if (lecturePlan) {
+    course.courseSpecs.lecturePlan = lecturePlan;
   }
   if (studentAssessment) {
     course.courseSpecs.studentAssessment = studentAssessment;
