@@ -109,6 +109,8 @@ services:
       - ./shared/utils:/programs/src/shared/utils
       - ./shared/controllers:/programs/src/shared/controllers
       - ./shared/middlewares:/programs/src/shared/middlewares
+      - ./public/programSpcs:/programs/src/public/programSpcs
+
     environment:
       - NODE_ENV=development
       - PORT=8080

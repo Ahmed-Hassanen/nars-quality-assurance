@@ -4,6 +4,10 @@ const catchAsync = require("../shared/utils/catchAsync");
 const AppError = require("../shared/utils/appError");
 const factory = require("../shared/controllers/handlerFactory");
 const axios = require("axios");
+const path = require("path");
+
+const multer = require("multer");
+
 exports.addProgram = factory.createOne(Program);
 exports.deleteProgram = factory.deleteOne(Program);
 exports.UpdateProgram = factory.updateOne(Program);
@@ -84,4 +88,61 @@ exports.viewComp = catchAsync(async (req, res, next) => {
     facultyComp: faculty.data.competences,
     departmentComp: department.data.competences,
   });
+});
+
+const multerProgramSpcs = require("multer");
+const multerStorageProgramSpcs = multerProgramSpcs.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/programSpcs/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const uploadProgramSpcs = multerProgramSpcs({
+  storage: multerStorageProgramSpcs,
+});
+exports.uploadProgramSpcs = uploadProgramSpcs.single("programSpcs");
+
+exports.addProgramSpcs = catchAsync(async (req, res, next) => {
+  console.log(__dirname);
+  if (!req.file) return next(new AppError("there is no file", 400));
+
+  const program = await Program.findByIdAndUpdate(
+    req.body.program,
+    { programSpcs: `${req.file.filename}` },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+  if (!program) {
+    return next(new AppError("No program found with that id", 404));
+  }
+  res.status(201).json({
+    status: "success",
+
+    data: program,
+  });
+});
+
+exports.getProgramSpcs = catchAsync(async (req, res, next) => {
+  let query = Program.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const program = await query;
+
+  if (!program) {
+    return next(new AppError("No program found with that id", 404));
+  }
+  if (!program.programSpcs) {
+    return next(new AppError("there is no spcs for this program", 404));
+  }
+  console.log("hereeeeeeeeeeeeee");
+  console.log(
+    path.resolve(`/${__dirname}/../public/programSpcs/${program.programSpcs}`)
+  );
+  res.download(
+    path.resolve(`/${__dirname}/../public/programSpcs/${program.programSpcs}`)
+  );
 });
