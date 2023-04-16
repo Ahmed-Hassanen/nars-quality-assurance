@@ -267,7 +267,9 @@ exports.addStudentsToDepartment = catchAsync(async (req, res, next) => {
   for (let i = 0; i < codes.length; i++) {
     const student = await Student.find({ code: codes[i] });
     if (!student)
-      return next(new AppError("No document found with that id", 404));
+      return next(
+        new AppError(`No student  found with that code ${codes[i]}`, 404)
+      );
     await Student.findByIdAndUpdate(
       student[0]._id,
       {
