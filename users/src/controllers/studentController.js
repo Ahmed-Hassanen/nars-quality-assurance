@@ -42,36 +42,38 @@ exports.getCourses = catchAsync(async (req, res, next) => {
   let query = Student.findById(req.params.id);
   const student = await query;
   const courses = student.courses;
+  console.log("hereeeeeeeeeeeeeeeeeee", courses);
   const passedCourses = student.passedCourses;
   const generalcourses = [];
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
   for (let i = 0; i < courses.length; i++) {
     let passed = false;
-    const header = `authorization: Bearer ${req.cookies.jwt}`;
 
     const course = await axios
       .get(`http://courses:8080/created-courses/${courses[i]}`, {
         headers: header,
       })
       .then((res) => res.data)
-      .catch((e) => {
-        return {
-          status: false,
-          message: "something went wrong",
-          code: 500,
-        };
-      });
+      .catch((e) => e.response.data);
+
     if (course.status === false) {
-      return next(new AppError(faculty.message, faculty.code));
+      return next(new AppError(course.message, course.code));
     }
     for (let j = 0; j < passedCourses.length; j++) {
-      console.log(course.data.course._id);
-      console.log(passedCourses[j]);
       if (course.data.course._id == passedCourses[j]) {
         passed = true;
         break;
       }
     }
-    generalcourses.push({ course: course.data.course._id, passed });
+    generalcourses.push({ course: course.data, passed });
   }
   res.status(201).json({
     status: "success",
@@ -206,8 +208,6 @@ exports.getStudentPhoto = catchAsync(async (req, res, next) => {
   if (!student) {
     return next(new AppError("No document found with that id", 404));
   }
-  console.log("heeeeeeeeeeeeere");
-  console.log(path.resolve(`/${__dirname}/../public/photos/${student.photo}`));
   res.download(path.resolve(`/${__dirname}/../public/photos/${student.photo}`));
 });
 

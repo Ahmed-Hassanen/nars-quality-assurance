@@ -15,6 +15,11 @@ router.post("/completeSignup", authController.completeSignup);
 router.post("/login", authController.login);
 router.patch("/addPassedCourses/:id", studentController.addPassedCourses);
 router.get("/userToken", authController.userToken);
+router.post("/addStudentsToProgram", staffController.addStudentsToProgram);
+router.post(
+  "/addStudentsToDepartment",
+  staffController.addStudentsToDepartment
+);
 router
   .route("/students/")
   .get(authController.protect, studentController.getAllStudents)

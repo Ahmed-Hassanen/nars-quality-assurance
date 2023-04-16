@@ -53,13 +53,91 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
   const surveyId = req.body.surveyId;
   const studentId = req.body.studentId;
   const answers = req.body.answers;
-
+  const mySet = new Set();
+  const sums = new Array(answers.length).fill(0);
+  const avgLOSIndir = [];
+  const avgCompsIndir = [];
+  let token;
   const surveySubmissions = await Sumbission.find({
     survey: surveyId,
     studentId: studentId,
   });
+  const allSurveySubmissions = await Sumbission.find({
+    survey: surveyId,
+  });
+  for (let i = 0; i < allSurveySubmissions.length; i++) {
+    for (let j = 0; j < allSurveySubmissions[i].answers.length; j++) {
+      sums[j] += allSurveySubmissions[i].answers[j];
+    }
+  }
+  for (let i = 0; i < answers.length; i++) sums[i] += answers[i];
+  for (let i = 0; i < answers.length; i++) {
+    avgLOSIndir.push({
+      LO: "LO" + (i + 1),
+      avg: sums[i] / (allSurveySubmissions.length + 1),
+    });
+  }
+  console.log(avgLOSIndir);
   const survey = await Survey.findById(surveyId);
-
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const courseInstance = await axios
+    .get(`http://courses:8080/created-courses/${survey.courseInstance}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  if (courseInstance.status === "fail") {
+    return next(new AppError(courseInstance.message, courseInstance.code));
+  }
+  const courseLearningOutcomes =
+    courseInstance.data.courseSpecs.courseLearningOutcomes;
+  const competences = courseInstance.data.course.competences;
+  for (let i = 0; i < competences.length; i++) {
+    let sum = 0;
+    let count = 0;
+    let avg = 0;
+    for (let j = 0; j < courseLearningOutcomes.length; j++) {
+      for (
+        let k = 0;
+        k < courseLearningOutcomes[j].learningOutcomes.length;
+        k++
+      ) {
+        for (
+          let m = 0;
+          m <
+          courseLearningOutcomes[j].learningOutcomes[k].mappedCompetence.length;
+          m++
+        ) {
+          if (
+            competences[i].code ==
+            courseLearningOutcomes[j].learningOutcomes[k].mappedCompetence[m]
+          ) {
+            for (let h = 0; h < avgLOSIndir.length; h++) {
+              if (
+                courseLearningOutcomes[j].learningOutcomes[k].code ==
+                avgLOSIndir[h].LO
+              ) {
+                sum += avgLOSIndir[h].avg;
+                count++;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+    avg = sum / count;
+    avgCompsIndir.push({ code: competences[i].code, avg });
+  }
   //check if dueTo Date is passed or not
   const currentDate = Date.now();
   if (survey.dueTo && currentDate > survey.dueTo) {
@@ -67,8 +145,27 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
       new AppError("This survey is over, you can't add any submission", 400)
     );
   }
-
   //check if the submission is already there
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  axios.patch(
+    `http://courses:8080/created-courses/${survey.courseInstance}`,
+    {
+      report: {
+        avgLOSInDirect: avgLOSIndir,
+        avgCompetencesInDirect: avgCompsIndir,
+      },
+    },
+    {
+      headers: { authorization: `Bearer ${token}` },
+    }
+  );
   if (surveySubmissions.length == 0) {
     const doc = await Sumbission.create({
       survey: surveyId,
@@ -87,10 +184,10 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
 });
 
 exports.getSurveySubmissions = catchAsync(async (req, res, next) => {
-  const surveyId = req.body.surveyId;
+  const surveyId = req.params.id;
 
   const submissions = await Sumbission.find({
-    survey: surveyId,
+    survey: req.params.id,
   });
 
   res.status(200).json({

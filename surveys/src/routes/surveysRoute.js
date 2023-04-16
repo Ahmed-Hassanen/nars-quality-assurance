@@ -10,9 +10,9 @@ router
   .post(protect, surveyController.addSurvey);
 
 router
-  .route("/submissions/")
-  .get(protect, surveyController.getSurveySubmissions)
-  .post(protect, surveyController.addSumbission);
+  .route("/submissions/:id")
+  .get(protect, surveyController.getSurveySubmissions);
+router.route("/submissions").post(protect, surveyController.addSumbission);
 
 router
   .route("/student-submissions")

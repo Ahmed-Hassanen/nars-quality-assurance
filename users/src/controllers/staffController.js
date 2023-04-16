@@ -1,4 +1,5 @@
 const Staff = require("../models/staffModel");
+const Student = require("../models/studentModel");
 const factory = require("./../shared/controllers/handlerFactory");
 const jwt = require("jsonwebtoken");
 const catchAsync = require("./../shared/utils/catchAsync");
@@ -6,6 +7,8 @@ const AppError = require("./../shared/utils/appError");
 const multer = require("multer");
 const { Kafka } = require("kafkajs");
 const path = require("path");
+const axios = require("axios");
+const student = require("../models/studentModel");
 const kafka = new Kafka({
   clientId: "my-app",
   brokers: process.env.KAFKA_ZOOKEEPER_CONNECT,
@@ -198,5 +201,87 @@ updateCourseInstructorConsumer = async () => {
     },
   });
 };
+exports.addStudentsToProgram = catchAsync(async (req, res, next) => {
+  const codes = req.body.codes;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const program = await axios
+    .get(`http://programs:8080/getProgramSummary/${req.body.program}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  if (program.status === "fail") {
+    return next(new AppError(program.message, program.code));
+  }
+  for (let i = 0; i < codes.length; i++) {
+    const student = await Student.find({ code: codes[i] });
+    if (!student)
+      return next(new AppError("No document found with that id", 404));
+    await Student.findByIdAndUpdate(
+      student[0]._id,
+      {
+        program: req.body.program,
+      },
+      {
+        new: true, //return updated document
+        runValidators: true,
+      }
+    );
+  }
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+exports.addStudentsToDepartment = catchAsync(async (req, res, next) => {
+  const codes = req.body.codes;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const department = await axios
+    .get(
+      `http://departments:8080/getDepartmentSummary/${req.body.department}`,
+      {
+        headers: header,
+      }
+    )
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  if (department.status === "fail") {
+    return next(new AppError(department.message, department.code));
+  }
+  for (let i = 0; i < codes.length; i++) {
+    const student = await Student.find({ code: codes[i] });
+    if (!student)
+      return next(new AppError("No document found with that id", 404));
+    await Student.findByIdAndUpdate(
+      student[0]._id,
+      {
+        department: req.body.department,
+      },
+      {
+        new: true, //return updated document
+        runValidators: true,
+      }
+    );
+  }
+  res.status(200).json({
+    status: "success",
+  });
+});
 
 updateCourseInstructorConsumer().catch(console.log);
