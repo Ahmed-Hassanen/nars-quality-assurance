@@ -178,6 +178,30 @@ const courseInstanceSchema = new mongoose.Schema({
         },
       ],
     },
+    avgCompetencesInDirect: {
+      type: [
+        {
+          code: {
+            type: String,
+          },
+          avg: {
+            type: Number,
+          },
+        },
+      ],
+    },
+    avgLOSInDirect: {
+      type: [
+        {
+          LO: {
+            type: String,
+          },
+          avg: {
+            type: Number,
+          },
+        },
+      ],
+    },
   },
 });
 

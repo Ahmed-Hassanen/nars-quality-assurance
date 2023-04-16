@@ -33,7 +33,7 @@ const staffSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
-    default: "default.jpg",
+    default: "1681661549091-default image.png",
   },
   role: {
     type: String,

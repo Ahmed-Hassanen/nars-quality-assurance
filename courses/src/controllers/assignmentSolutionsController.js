@@ -8,6 +8,7 @@ const Course = require("../models/courseModel");
 const path = require("path");
 const CourseInstance = require("../models/courseInstanceModel");
 exports.getAllAssignmentSolutions = factory.getAll(AssignmentSolution);
+exports.updateAssignmentSolution = factory.updateOne(AssignmentSolution);
 exports.deleteAssignmentSolution = catchAsync(async (req, res, next) => {
   const doc = await AssignmentSolution.findById(req.params.id);
   if (!doc) {
