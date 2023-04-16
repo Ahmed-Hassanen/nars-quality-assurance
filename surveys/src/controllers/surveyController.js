@@ -53,7 +53,6 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
   const surveyId = req.body.surveyId;
   const studentId = req.body.studentId;
   const answers = req.body.answers;
-  const mySet = new Set();
   const sums = new Array(answers.length).fill(0);
   const avgLOSIndir = [];
   const avgCompsIndir = [];
@@ -62,6 +61,14 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
     survey: surveyId,
     studentId: studentId,
   });
+  const survey = await Survey.findById(surveyId);
+  //check if dueTo Date is passed or not
+  const currentDate = Date.now();
+  if (survey.dueTo && currentDate > survey.dueTo) {
+    return next(
+      new AppError("This survey is over, you can't add any submission", 400)
+    );
+  }
   const allSurveySubmissions = await Sumbission.find({
     survey: surveyId,
   });
@@ -77,8 +84,6 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
       avg: sums[i] / (allSurveySubmissions.length + 1),
     });
   }
-  console.log(avgLOSIndir);
-  const survey = await Survey.findById(surveyId);
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -138,40 +143,33 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
     avg = sum / count;
     avgCompsIndir.push({ code: competences[i].code, avg });
   }
-  //check if dueTo Date is passed or not
-  const currentDate = Date.now();
-  if (survey.dueTo && currentDate > survey.dueTo) {
-    return next(
-      new AppError("This survey is over, you can't add any submission", 400)
-    );
-  }
   //check if the submission is already there
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
-  axios.patch(
-    `http://courses:8080/created-courses/${survey.courseInstance}`,
-    {
-      report: {
-        avgLOSInDirect: avgLOSIndir,
-        avgCompetencesInDirect: avgCompsIndir,
-      },
-    },
-    {
-      headers: { authorization: `Bearer ${token}` },
-    }
-  );
   if (surveySubmissions.length == 0) {
     const doc = await Sumbission.create({
       survey: surveyId,
       studentId,
       answers,
     });
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+    axios.patch(
+      `http://courses:8080/created-courses/${survey.courseInstance}`,
+      {
+        report: {
+          avgLOSInDirect: avgLOSIndir,
+          avgCompetencesInDirect: avgCompsIndir,
+        },
+      },
+      {
+        headers: { authorization: `Bearer ${token}` },
+      }
+    );
     res.status(201).json({
       status: "success",
       data: doc,
