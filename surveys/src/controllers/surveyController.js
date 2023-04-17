@@ -30,10 +30,12 @@ exports.addSurvey = catchAsync(async (req, res, next) => {
   if (courseInstance.status === "fail") {
     return next(new AppError(courseInstance.message, courseInstance.code));
   }
-  req.body.questions =
-    courseInstance.data.courseSpecs.courseLearningOutcomes.map(
-      (lo) => lo.title
+  req.body.questions = [];
+  courseInstance.data.courseSpecs.courseLearningOutcomes.forEach((clo) => {
+    clo.learningOutcomes.forEach((lo) =>
+      req.body.questions.push(lo.description)
     );
+  });
   console.log(req.body.questions);
   const doc = await Survey.create(req.body);
   res.status(201).json({
