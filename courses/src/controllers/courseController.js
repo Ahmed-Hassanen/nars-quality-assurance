@@ -63,6 +63,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   if (!orignalCourse) {
     return next(new AppError("No document found with that id", 404));
   }
+
   let token;
   if (
     req.headers.authorization &&
@@ -142,6 +143,14 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
       )
     );
   });
+  const newOriginalCourse = await Course.findByIdAndUpdate(
+    req.body.course,
+    { currentInstance: courseinstance._id },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
 
   const promises = await Promise.all(updatedStudents);
 
