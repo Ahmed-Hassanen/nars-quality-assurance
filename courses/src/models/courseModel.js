@@ -46,9 +46,13 @@ const courseSchema = new mongoose.Schema({
       date: Date,
     },
   ],
-  target: {
+  minTarget: {
     type: Number,
     default: 50,
+  },
+  maxTarget: {
+    type: Number,
+    default: 70,
   },
 });
 

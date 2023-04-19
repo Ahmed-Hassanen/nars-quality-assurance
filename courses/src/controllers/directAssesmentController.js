@@ -51,7 +51,11 @@ exports.addDirectAssesment = catchAsync(async (req, res, next) => {
   console.log(report);
   const doc = await CourseInstance.findByIdAndUpdate(
     req.params.id,
-    { report },
+    {
+      "report.questions": report.questions,
+      "report.avgCompetences": report.avgCompetences,
+    },
+
     {
       new: true, //return updated document
       runValidators: true,
