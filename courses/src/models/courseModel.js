@@ -11,6 +11,9 @@ const courseSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+  currentInstance: {
+    type: mongoose.Schema.ObjectId,
+  },
   academicYear: {
     type: String,
     required: [true, "course must belong to ademic year"],

@@ -34,11 +34,7 @@ router
 router
   .route("/students/:id")
   .get(authController.protect, studentController.getStudent)
-  .patch(
-    authController.protect,
-    authController.restrictTo("system admin"),
-    studentController.updateStudent
-  )
+  .patch(authController.protect, studentController.updateStudent)
   .delete(
     authController.protect,
     authController.restrictTo("system admin"),
