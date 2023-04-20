@@ -212,7 +212,7 @@ courseInstanceSchema.pre(/^find/, function (next) {
 });
 
 courseInstanceSchema.pre("find", function (next) {
-  this.select("-courseSpecs");
+  this.select("-courseSpecs -report -avgCompetences");
   next();
 });
 
