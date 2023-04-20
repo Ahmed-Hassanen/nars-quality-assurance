@@ -91,6 +91,7 @@ exports.viewComp = catchAsync(async (req, res, next) => {
 });
 
 const multerProgramSpcs = require("multer");
+const program = require("../models/programModel");
 const multerStorageProgramSpcs = multerProgramSpcs.diskStorage({
   destination: (req, file, cb) => {
     cb(null, `/${__dirname}/../public/programSpcs/`);
@@ -145,4 +146,157 @@ exports.getProgramSpcs = catchAsync(async (req, res, next) => {
   res.download(
     path.resolve(`/${__dirname}/../public/programSpcs/${program.programSpcs}`)
   );
+});
+
+exports.getProgramLOs = catchAsync(async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const originalCourses = await axios
+    .get(`http://courses:8080/original-courses?${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (originalCourses.status === "fail") {
+    return next(new AppError(courseInstance.message, courseInstance.code));
+  }
+  const programLOs = [];
+  originalCourses.data.forEach((originalCourse) => {
+    if (
+      originalCourse.currentInstance &&
+      originalCourse.currentInstance.courseSpecsCompleted
+    ) {
+      originalCourse.currentInstance.courseSpecs.courseLearningOutcomes.forEach(
+        (courseLearningOutcome) => {
+          courseLearningOutcome.learningOutcomes.forEach((lo) => {
+            programLOs.push(lo.description);
+          });
+        }
+      );
+    }
+  });
+  res.status(200).json({
+    status: "success",
+    data: {
+      programLOs,
+    },
+  });
+});
+
+exports.getProgramDirectAssessment = catchAsync(async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const originalCourses = await axios
+    .get(`http://courses:8080/original-courses?${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (originalCourses.status === "fail") {
+    return next(new AppError(originalCourses.message, originalCourses.code));
+  }
+  ////////////////////////////////////////////////////////
+  const competences = await axios
+    .get(`http://programs:8080/viewComp/${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (competences.status === "fail") {
+    return next(new AppError(competences.message, competences.code));
+  }
+  ///////////////////////////////////////////////
+
+  const courseAvgDirect = [];
+  originalCourses.data.forEach((originalCourse) => {
+    if (
+      originalCourse.currentInstance &&
+      originalCourse.currentInstance.report.avgCompetences.length > 0
+    ) {
+      const courseObj = {
+        name: originalCourse.name,
+        code: originalCourse.code,
+      };
+      let courseAvgComp = 0;
+      originalCourse.currentInstance.report.avgCompetences.forEach(
+        (competence) => {
+          courseAvgComp += competence.avg;
+        }
+      );
+      courseAvgComp =
+        courseAvgComp /
+        originalCourse.currentInstance.report.avgCompetences.length;
+      courseObj.avg = courseAvgComp;
+      courseAvgDirect.push(courseObj);
+    }
+  });
+  //////////////////////////////////////////////////
+  const programComp = [];
+  competences.programComp.forEach((comp) => programComp.push(comp.code));
+  competences.facultyComp.forEach((comp) => programComp.push(comp.code));
+  competences.departmentComp.forEach((comp) => programComp.push(comp.code));
+  console.log(programComp);
+  const programCompAvgs = [];
+  programComp.forEach((comp) => {
+    let compAvg = 0;
+    let numCourse = 0;
+    originalCourses.data.forEach((originalCourse) => {
+      if (
+        originalCourse.currentInstance &&
+        originalCourse.currentInstance.report.avgCompetences.length > 0
+      ) {
+        originalCourse.currentInstance.report.avgCompetences.forEach(
+          (courseComp) => {
+            if (courseComp.code === comp) {
+              compAvg += courseComp.avg;
+              numCourse++;
+            }
+          }
+        );
+      }
+    });
+    compAvg = compAvg / numCourse;
+    programCompAvgs.push({ code: comp, avg: compAvg });
+  });
+  /////////////////////
+  const updatedProgram = await Program.findByIdAndUpdate(
+    req.params.id,
+    {
+      "report.courseAvgDirect": courseAvgDirect,
+      "report.programCompAvgs": programCompAvgs,
+    },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!updatedProgram) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  ////////////////////////
+  res.status(200).json({
+    status: "success",
+    data: {
+      report: updatedProgram.report,
+    },
+  });
 });

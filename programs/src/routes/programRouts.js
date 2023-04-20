@@ -11,14 +11,21 @@ router.route("/programSpcs/:id").get(programController.getProgramSpcs);
 
 router.get("/getProgramSummary/:id", programController.getProgramSummary);
 router.route("/viewComp/:id").get(protect, programController.viewComp);
-router.post("/", protect, programController.addProgram);
+router
+  .route("/")
+  .post(protect, programController.addProgram)
+  .get(protect, programController.getAllPrograms);
 
-router.get("/", protect, programController.getAllPrograms);
+router
+  .route("/:id")
+  .get(protect, programController.getProgram)
+  .patch(protect, programController.UpdateProgram)
+  .delete(protect, programController.deleteProgram);
 
-router.get("/:id", protect, programController.getProgram);
+router
+  .route("/:id/directAssessment")
+  .get(programController.getProgramDirectAssessment);
 
-router.patch("/:id", protect, programController.UpdateProgram);
-
-router.delete("/:id", protect, programController.deleteProgram);
+router.route("/:id/LOS").get(programController.getProgramLOs);
 
 module.exports = router;
