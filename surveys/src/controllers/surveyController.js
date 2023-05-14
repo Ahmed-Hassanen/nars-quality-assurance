@@ -36,6 +36,7 @@ exports.addSurvey = catchAsync(async (req, res, next) => {
       req.body.questions.push(lo.description)
     );
   });
+  req.body.name = courseInstance.data.course.name + " Survey";
   console.log(req.body.questions);
   const doc = await Survey.create(req.body);
   res.status(201).json({
