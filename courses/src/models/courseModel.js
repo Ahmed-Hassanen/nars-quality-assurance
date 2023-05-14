@@ -13,6 +13,7 @@ const courseSchema = new mongoose.Schema({
   },
   currentInstance: {
     type: mongoose.Schema.ObjectId,
+    ref: "courseInstance",
   },
   academicYear: {
     type: String,
@@ -57,6 +58,11 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     default: 70,
   },
+});
+courseSchema.pre(/^find/, function (next) {
+  this.populate({ path: "currentInstance", select: "-course courseSpecs" });
+
+  next();
 });
 
 const Course = mongoose.model("course", courseSchema);

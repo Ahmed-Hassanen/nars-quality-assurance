@@ -29,6 +29,14 @@ const programSchema = new mongoose.Schema({
   programSpcs: {
     type: String,
   },
+  report: {
+    courseAvgDirect: {
+      type: [Object],
+    },
+    programCompAvgs: {
+      type: [Object],
+    },
+  },
 });
 
 const program = mongoose.model("program", programSchema);
