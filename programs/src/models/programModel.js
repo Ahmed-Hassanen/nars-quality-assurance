@@ -36,6 +36,15 @@ const programSchema = new mongoose.Schema({
     programCompAvgs: {
       type: [Object],
     },
+    courseAvgIndirect: {
+      type: [Object],
+    },
+    programCompAvgsIndirect: {
+      type: [Object],
+    },
+    percentageOfFillingReport: Number,
+
+    percentageOfFillingSpecs: Number,
   },
 });
 
