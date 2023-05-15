@@ -56,7 +56,10 @@ const studentSchema = new mongoose.Schema({
     type: [String],
     required: [true, "student must belong to academic year"],
   },
-  role: String,
+  role: {
+    type: String,
+    default: "student",
+  },
 });
 
 studentSchema.pre("save", async function (next) {

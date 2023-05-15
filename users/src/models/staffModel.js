@@ -50,6 +50,21 @@ const staffSchema = new mongoose.Schema({
       "department head",
     ],
   },
+  role: {
+    type: String,
+    enum: [
+      "instructor",
+      "quality coordinator",
+      "program coordinator",
+      "dean",
+      "teaching assistant",
+      "system admin",
+      "faculty admin",
+      "program admin",
+      "department admin",
+      "department head",
+    ],
+  },
 
   passwordResetToken: String,
   passwordResetExpires: Date,
