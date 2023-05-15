@@ -199,7 +199,7 @@ exports.getSurveySubmissions = catchAsync(async (req, res, next) => {
 });
 
 exports.getStudentSubmissions = catchAsync(async (req, res, next) => {
-  const studentId = req.body.studentId;
+  const studentId = req.query.studentId;
   const submissions = await Sumbission.find({ studentId });
 
   res.status(200).json({
