@@ -25,6 +25,13 @@ router
 router
   .route("/:id/directAssessment")
   .get(programController.getProgramDirectAssessment);
+router
+  .route("/:id/inDirectAssessment")
+  .get(programController.getProgramInDirectAssessment);
+router
+  .route("/:id/percentageSpecsAndReports")
+
+  .get(programController.getPercentageOfSpecsAndReports);
 
 router.route("/:id/LOS").get(programController.getProgramLOs);
 

@@ -211,6 +211,7 @@ exports.getProgramDirectAssessment = catchAsync(async (req, res, next) => {
   if (originalCourses.status === "fail") {
     return next(new AppError(originalCourses.message, originalCourses.code));
   }
+
   ////////////////////////////////////////////////////////
   const competences = await axios
     .get(`http://programs:8080/viewComp/${req.params.id}`, {
@@ -247,23 +248,32 @@ exports.getProgramDirectAssessment = catchAsync(async (req, res, next) => {
       courseAvgDirect.push(courseObj);
     }
   });
+  // console.log("yooooooooooooooooooooooooooooo", competences);
   //////////////////////////////////////////////////
   const programComp = [];
   competences.programComp.forEach((comp) => programComp.push(comp.code));
   competences.facultyComp.forEach((comp) => programComp.push(comp.code));
   competences.departmentComp.forEach((comp) => programComp.push(comp.code));
-  console.log(programComp);
+  // console.log("hereeeeeeeeeeeeeeeeeee", programComp);
   const programCompAvgs = [];
   programComp.forEach((comp) => {
     let compAvg = 0;
     let numCourse = 0;
+    // console.log("yooooooooooooooooooooooo", comp);
     originalCourses.data.forEach((originalCourse) => {
+      // console.log(
+      //   "yoooooooooooooooooooooooxxxx",
+      //   originalCourse.currentInstance.report.avgCompetences.length
+      // );
       if (
         originalCourse.currentInstance &&
         originalCourse.currentInstance.report.avgCompetences.length > 0
       ) {
+        // console.log("yoooooooooooooooooooooooxxxxxx", originalCourse);
         originalCourse.currentInstance.report.avgCompetences.forEach(
           (courseComp) => {
+            console.log("yooooooooooooooooooooooooooooooxxxx", courseComp.code);
+            console.log("yooooooooooooooooooooooooooooooxxxx", comp);
             if (courseComp.code === comp) {
               compAvg += courseComp.avg;
               numCourse++;
@@ -297,6 +307,197 @@ exports.getProgramDirectAssessment = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       report: updatedProgram.report,
+    },
+  });
+});
+exports.getProgramInDirectAssessment = catchAsync(async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const originalCourses = await axios
+    .get(`http://courses:8080/original-courses?${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (originalCourses.status === "fail") {
+    return next(new AppError(originalCourses.message, originalCourses.code));
+  }
+  ////////////////////////////////////////////////////////
+  const competences = await axios
+    .get(`http://programs:8080/viewComp/${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (competences.status === "fail") {
+    return next(new AppError(competences.message, competences.code));
+  }
+  ///////////////////////////////////////////////
+
+  const courseAvgInDirect = [];
+  originalCourses.data.forEach((originalCourse) => {
+    if (
+      originalCourse.currentInstance &&
+      originalCourse.currentInstance.report.avgCompetencesInDirect.length > 0
+    ) {
+      const courseObj = {
+        name: originalCourse.name,
+        code: originalCourse.code,
+      };
+      let courseAvgComp = 0;
+      originalCourse.currentInstance.report.avgCompetencesInDirect.forEach(
+        (competence) => {
+          courseAvgComp += competence.avg;
+        }
+      );
+      courseAvgComp =
+        courseAvgComp /
+        originalCourse.currentInstance.report.avgCompetencesInDirect.length;
+      courseObj.avg = courseAvgComp;
+      courseAvgInDirect.push(courseObj);
+    }
+  });
+  //////////////////////////////////////////////////
+  const programComp = [];
+  competences.programComp.forEach((comp) => programComp.push(comp.code));
+  competences.facultyComp.forEach((comp) => programComp.push(comp.code));
+  competences.departmentComp.forEach((comp) => programComp.push(comp.code));
+  console.log(programComp);
+  const programCompAvgs = [];
+  programComp.forEach((comp) => {
+    let compAvg = 0;
+    let numCourse = 0;
+    originalCourses.data.forEach((originalCourse) => {
+      if (
+        originalCourse.currentInstance &&
+        originalCourse.currentInstance.report.avgCompetencesInDirect.length > 0
+      ) {
+        originalCourse.currentInstance.report.avgCompetencesInDirect.forEach(
+          (courseComp) => {
+            if (courseComp.code === comp) {
+              compAvg += courseComp.avg;
+              numCourse++;
+            }
+          }
+        );
+      }
+    });
+    compAvg = compAvg / numCourse;
+    programCompAvgs.push({ code: comp, avg: compAvg });
+  });
+  /////////////////////
+  const updatedProgram = await Program.findByIdAndUpdate(
+    req.params.id,
+    {
+      "report.courseAvgIndirect": courseAvgInDirect,
+      "report.programCompAvgsIndirect": programCompAvgs,
+    },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!updatedProgram) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  ////////////////////////
+  res.status(200).json({
+    status: "success",
+    data: {
+      report: updatedProgram.report,
+    },
+  });
+});
+
+exports.getPercentageOfSpecsAndReports = catchAsync(async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+  const originalCourses = await axios
+    .get(`http://courses:8080/original-courses?${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (originalCourses.status === "fail") {
+    return next(new AppError(originalCourses.message, originalCourses.code));
+  }
+  ////////////////////////////////////////////////////////
+  const competences = await axios
+    .get(`http://programs:8080/viewComp/${req.params.id}`, {
+      headers: header,
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response.data);
+  //console.log(courseInstance);
+  if (competences.status === "fail") {
+    return next(new AppError(competences.message, competences.code));
+  }
+  ///////////////////////////////////////////////
+
+  let completedReports = 0;
+  let completedSpecs = 0;
+  originalCourses.data.forEach((originalCourse) => {
+    if (
+      originalCourse.currentInstance &&
+      originalCourse.currentInstance.reportCompleted
+    ) {
+      completedReports++;
+    }
+    if (
+      originalCourse.currentInstance &&
+      originalCourse.currentInstance.courseSpecsCompleted
+    ) {
+      completedSpecs++;
+    }
+  });
+  //////////////////////////////////////////////////
+  console.log(originalCourses.data.length);
+  const percentageOfFillingReport =
+    completedReports / originalCourses.data.length;
+  const percentageOfFillingSpecs = completedSpecs / originalCourses.data.length;
+  /////////////////////
+  const updatedProgram = await Program.findByIdAndUpdate(
+    req.params.id,
+    {
+      "report.percentageOfFillingReport": percentageOfFillingReport,
+      "report.percentageOfFillingSpecs": percentageOfFillingSpecs,
+    },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+
+  if (!updatedProgram) {
+    return next(new AppError("No document found with that id", 404));
+  }
+
+  ////////////////////////
+  res.status(200).json({
+    status: "success",
+    data: {
+      percentageOfFillingReport:
+        updatedProgram.report.percentageOfFillingReport,
+      percentageOfFillingSpecs: updatedProgram.report.percentageOfFillingSpecs,
     },
   });
 });
