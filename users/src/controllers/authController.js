@@ -219,6 +219,17 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(userPassword, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
+  if (req.body.role) {
+    if (user.role.includes(req.body.role)) {
+      user.role = req.body.role;
+      await user.save();
+    } else {
+      next(
+        new AppError(`the user doesn't has this role (${req.body.role})`),
+        401
+      );
+    }
+  }
 
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
