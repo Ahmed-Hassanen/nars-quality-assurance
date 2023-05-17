@@ -22,6 +22,47 @@ exports.getAllMarks = catchAsync(async (req, res, next) => {
 });
 
 exports.addAllStudentMarks = catchAsync(async (req, res, next) => {
+  //console.log("aaaaaaaaaaaaaaaaaa");
+  const marks = req.body.marks;
+
+  const studentsCodes = marks.map((mark) => {
+    // console.log(mark);
+    return mark.studentCode;
+  });
+  //console.log("student codes", codes);
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
+
+  const studentsIDsREQ = [];
+  studentsCodes.forEach((code) => {
+    studentsIDsREQ.push(
+      axios.get(`http://users:8080/students?code=${code}`, {
+        headers: { authorization: `Bearer ${req.cookies.jwt}` },
+      })
+    );
+  });
+
+  const promises = await Promise.all(studentsIDsREQ);
+
+  const studentsIDsRes = promises.map((res) => res.data);
+  console.log("ids Done");
+  console.log(studentsIDsRes);
+
+  const studentsIDs = studentsIDsRes.map((student) => {
+    return student.data[0]._id;
+  });
+  console.log(studentsIDs);
+  for (let i = 0; i < studentsIDs.length; i++) {
+    req.body.marks[i].studentID = studentsIDs[i];
+  }
+  console.log("marks", req.body.marks);
   const doc = await CourseInstance.findByIdAndUpdate(
     req.params.course,
     req.body,
@@ -53,11 +94,11 @@ exports.addStudentMarks = catchAsync(async (req, res, next) => {
   //console.log(doc.marks);
   const marks = doc.marks;
   for (let i = 0; i < marks.length; i++) {
-    if (marks[i].studentId === req.params.studentId)
+    if (marks[i].studentID === req.params.studentId)
       return next(new AppError("the student has a mark already", 400));
   }
   //   const marks = [{ studentId: "gdrgrd", mark: 57 }];
-  marks.push({ studentId: req.params.studentId, mark: req.body.mark });
+  marks.push({ studentID: req.params.studentId, mark: req.body.mark });
   console.log(marks);
   const newCourseInstance = await CourseInstance.findByIdAndUpdate(
     req.params.course,
@@ -90,8 +131,11 @@ exports.getStudentMarks = catchAsync(async (req, res, next) => {
     return next(new AppError("No document found with that id", 404));
   }
   let studentMark;
+  console.log("marks", doc.marks);
+
   doc.marks.forEach((mark) => {
-    if (mark.studentId == req.params.studentId) studentMark = mark.mark;
+    console.log(mark.studentID, req.params.studentId);
+    if (mark.studentID == req.params.studentId) studentMark = mark.mark;
   });
   if (!studentMark)
     return next(new AppError("the student has no mark yet", 404));
@@ -115,7 +159,7 @@ exports.updateStudentMarks = catchAsync(async (req, res, next) => {
   let marks = doc.marks;
   let i = 0;
   marks.forEach((mark) => {
-    if (mark.studentId == req.params.studentId) marks[i].mark = req.body.mark;
+    if (mark.studentID == req.params.studentId) marks[i].mark = req.body.mark;
     i++;
   });
   const newCourseInstance = await CourseInstance.findByIdAndUpdate(
@@ -151,14 +195,14 @@ isPassedCourse = catchAsync(async (req, res, next) => {
   }
   const updatedStudents = [];
   courseinstance.marks.forEach((student) => {
-    console.log(student.studentId);
+    // console.log(student.studentId);
     if (
       student.mark >= course.fullMark / 2 &&
       student.mark <= course.fullMark
     ) {
       updatedStudents.push(
         axios.patch(
-          `http://users:8080/addPassedCourses/${student.studentId}`,
+          `http://users:8080/addPassedCourses/${student.studentID}`,
           {
             passedCourse: courseinstance.course,
           },
