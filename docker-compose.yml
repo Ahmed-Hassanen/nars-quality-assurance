@@ -25,13 +25,6 @@ services:
       - 27017:27017
     volumes:
       - ./data/users:/data/db
-  competences_db:
-    container_name: competences_db
-    image: mohamedsalama118/mongo
-    ports:
-      - 27019:27017
-    volumes:
-      - ./data/competences:/data/db
   courses_db:
     container_name: courses_db
     image: mohamedsalama118/mongo
