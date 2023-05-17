@@ -23,11 +23,7 @@ router.post(
 router
   .route("/students/")
   .get(authController.protect, studentController.getAllStudents)
-  .post(
-    authController.protect,
-    authController.restrictTo("system admin"),
-    studentController.createStudent
-  );
+  .post(authController.protect, studentController.createStudent);
 router
   .route("/students/getCourses/:id")
   .get(authController.protect, studentController.getCourses);
