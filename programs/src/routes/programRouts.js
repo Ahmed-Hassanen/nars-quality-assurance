@@ -9,6 +9,14 @@ router
   .post(programController.uploadProgramSpcs, programController.addProgramSpcs);
 router.route("/programSpcs/:id").get(programController.getProgramSpcs);
 
+router
+  .route("/programReport")
+  .post(
+    programController.uploadProgramReport,
+    programController.addProgramReport
+  );
+router.route("/programReport/:id").get(programController.getProgramReport);
+
 router.get("/getProgramSummary/:id", programController.getProgramSummary);
 router.route("/viewComp/:id").get(protect, programController.viewComp);
 router

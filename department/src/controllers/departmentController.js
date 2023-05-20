@@ -43,7 +43,15 @@ exports.getDepartment = catchAsync(async (req, res, next) => {
   if (!doc) {
     return next(new AppError("No document found with that id", 404));
   }
-  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
 
   const faculty = await axios
     .get(`http://faculty:8080/getFacultySummary/${doc.faculty}`, {
