@@ -38,13 +38,13 @@ exports.addAllStudentMarks = catchAsync(async (req, res, next) => {
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
-  const header = `authorization: Bearer ${token}`;
+  //const header = `authorization: Bearer ${token}`;
 
   const studentsIDsREQ = [];
   studentsCodes.forEach((code) => {
     studentsIDsREQ.push(
       axios.get(`http://users:8080/students?code=${code}`, {
-        headers: { authorization: `Bearer ${req.cookies.jwt}` },
+        headers: { authorization: `Bearer ${token}` },
       })
     );
   });
@@ -181,6 +181,14 @@ exports.updateStudentMarks = catchAsync(async (req, res, next) => {
 });
 
 isPassedCourse = catchAsync(async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
   let query = CourseInstance.findById(req.params.course);
   const courseinstance = await query;
 
@@ -207,7 +215,7 @@ isPassedCourse = catchAsync(async (req, res, next) => {
             passedCourse: courseinstance.course,
           },
           {
-            headers: { authorization: `Bearer ${req.cookies.jwt}` },
+            headers: { authorization: `Bearer ${token}` },
           }
         )
       );

@@ -101,6 +101,16 @@ const multerStorageProgramSpcs = multerProgramSpcs.diskStorage({
   },
 });
 
+const multerProgramReport = require("multer");
+const multerStorageProgramReport = multerProgramReport.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/programsReport/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
 const uploadProgramSpcs = multerProgramSpcs({
   storage: multerStorageProgramSpcs,
 });
@@ -145,6 +155,57 @@ exports.getProgramSpcs = catchAsync(async (req, res, next) => {
   );
   res.download(
     path.resolve(`/${__dirname}/../public/programSpcs/${program.programSpcs}`)
+  );
+});
+
+const uploadProgramReport = multerProgramSpcs({
+  storage: multerStorageProgramReport,
+});
+exports.uploadProgramReport = uploadProgramReport.single("programReport");
+
+exports.addProgramReport = catchAsync(async (req, res, next) => {
+  console.log(__dirname);
+  if (!req.file) return next(new AppError("there is no file", 400));
+
+  const program = await Program.findByIdAndUpdate(
+    req.body.program,
+    { programReportPdf: `${req.file.filename}` },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+  if (!program) {
+    return next(new AppError("No program found with that id", 404));
+  }
+  res.status(201).json({
+    status: "success",
+
+    data: program,
+  });
+});
+
+exports.getProgramReport = catchAsync(async (req, res, next) => {
+  let query = Program.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const program = await query;
+
+  if (!program) {
+    return next(new AppError("No program found with that id", 404));
+  }
+  if (!program.programSpcs) {
+    return next(new AppError("there is no report for this program", 404));
+  }
+  console.log("hereeeeeeeeeeeeee");
+  console.log(
+    path.resolve(
+      `/${__dirname}/../public/programsReport/${program.programReportPdf}`
+    )
+  );
+  res.download(
+    path.resolve(
+      `/${__dirname}/../public/programsReport/${program.programReportPdf}`
+    )
   );
 });
 

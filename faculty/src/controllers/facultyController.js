@@ -38,7 +38,15 @@ exports.createFaculty = catchAsync(async (req, res, next) => {
 });
 exports.getFacultySummary = factory.getOne(Faculty);
 exports.getFaculty = catchAsync(async (req, res, next) => {
-  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+  const header = `authorization: Bearer ${token}`;
   const departments = await axios
     .get(`http://department:8080/?faculty=${req.params.id}`, {
       headers: header,

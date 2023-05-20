@@ -29,6 +29,9 @@ const programSchema = new mongoose.Schema({
   programSpcs: {
     type: String,
   },
+  programReportPdf: {
+    type: String,
+  },
   report: {
     courseAvgDirect: {
       type: [Object],
