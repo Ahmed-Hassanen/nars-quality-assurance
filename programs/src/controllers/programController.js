@@ -104,7 +104,7 @@ const multerStorageProgramSpcs = multerProgramSpcs.diskStorage({
 const multerProgramReport = require("multer");
 const multerStorageProgramReport = multerProgramReport.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, `/${__dirname}/../public/programsReport/`);
+    cb(null, `/${__dirname}/../public/programReport/`);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -199,12 +199,12 @@ exports.getProgramReport = catchAsync(async (req, res, next) => {
   console.log("hereeeeeeeeeeeeee");
   console.log(
     path.resolve(
-      `/${__dirname}/../public/programsReport/${program.programReportPdf}`
+      `/${__dirname}/../public/programReport/${program.programReportPdf}`
     )
   );
   res.download(
     path.resolve(
-      `/${__dirname}/../public/programsReport/${program.programReportPdf}`
+      `/${__dirname}/../public/programReport/${program.programReportPdf}`
     )
   );
 });

@@ -11,6 +11,11 @@ router
   .post(courseController.uploadSpcsPdf, courseController.addSpcsPdf);
 router.route("/specsPdf/:id").get(courseController.getSpecsPdf);
 
+router
+  .route("/reportPdf")
+  .post(courseController.uploadReportPdf, courseController.addReportPdf);
+router.route("/reportPdf/:id").get(courseController.getReportPdf);
+
 router.route("/viewComp/:id").get(protect, courseController.viewComp);
 router
   .route("/original-courses")

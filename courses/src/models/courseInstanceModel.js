@@ -152,6 +152,7 @@ const courseInstanceSchema = new mongoose.Schema({
   },
 
   courseSpecsPath: String,
+  courseReportPath: String,
   report: {
     questions: {
       type: [
