@@ -110,7 +110,7 @@ services:
       - ./shared/controllers:/programs/src/shared/controllers
       - ./shared/middlewares:/programs/src/shared/middlewares
       - ./public/programSpcs:/programs/src/public/programSpcs
-      - ./public/programsReport:/programs/src/public/programsReport
+      - ./public/programReport:/programs/src/public/programReport
 
     environment:
       - NODE_ENV=development
@@ -220,6 +220,7 @@ services:
       - ./public/assignments:/courses/src/public/assignments
       - ./public/assignmentSolutions:/courses/src/public/assignmentSolutions
       - ./public/courseSpcs:/courses/src/public/courseSpcs
+      - ./public/courseReport:/courses/src/public/courseReport
     environment:
       - NODE_ENV=development
       - PORT=8080

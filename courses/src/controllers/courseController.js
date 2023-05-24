@@ -493,6 +493,9 @@ exports.getSpecsPdf = catchAsync(async (req, res, next) => {
   if (!courseinstance) {
     return next(new AppError("No courseinstance found with that id", 404));
   }
+  if (!courseinstance.courseSpecsPath) {
+    return next(new AppError("No spcs found with that course", 404));
+  }
   console.log("hereeeeeeeeeeeeee");
   console.log(
     path.resolve(
@@ -502,6 +505,71 @@ exports.getSpecsPdf = catchAsync(async (req, res, next) => {
   res.download(
     path.resolve(
       `/${__dirname}/../public/courseSpcs/${courseinstance.courseSpecsPath}`
+    )
+  );
+  // res.send();
+  // res.status(200).json({
+  //   status: "success",
+
+  //   data: exam,
+  // });
+});
+
+const multerReportPdf = require("multer");
+const multerStorageReportPdf = multerReportPdf.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, `/${__dirname}/../public/courseReport/`);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const uploadReportPdf = multerReportPdf({ storage: multerStorageReportPdf });
+exports.uploadReportPdf = uploadReportPdf.single("courseReport");
+
+exports.addReportPdf = catchAsync(async (req, res, next) => {
+  console.log(__dirname);
+  if (!req.file) return next(new AppError("there is no file", 400));
+
+  const courseinstance = await CourseInstance.findByIdAndUpdate(
+    req.body.courseInstance,
+    { courseReportPath: `${req.file.filename}` },
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+  if (!courseinstance) {
+    return next(new AppError("No courseinstance found with that id", 404));
+  }
+  res.status(201).json({
+    status: "success",
+
+    data: courseinstance,
+  });
+});
+
+exports.getReportPdf = catchAsync(async (req, res, next) => {
+  let query = CourseInstance.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const courseinstance = await query;
+
+  if (!courseinstance) {
+    return next(new AppError("No courseinstance found with that id", 404));
+  }
+  if (!courseinstance.courseReportPath) {
+    return next(new AppError("No report found with that course", 404));
+  }
+  console.log("hereeeeeeeeeeeeee");
+  console.log(
+    path.resolve(
+      `/${__dirname}/../public/courseReport/${courseinstance.courseReportPath}`
+    )
+  );
+  res.download(
+    path.resolve(
+      `/${__dirname}/../public/courseReport/${courseinstance.courseReportPath}`
     )
   );
   // res.send();
