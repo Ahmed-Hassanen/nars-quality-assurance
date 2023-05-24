@@ -105,6 +105,11 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
   if (courseInstance.status === "fail") {
     return next(new AppError(courseInstance.message, courseInstance.code));
   }
+  console.log(
+    "course instanceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    courseInstance
+  );
+  const report = courseInstance.data.report;
   const courseLearningOutcomes =
     courseInstance.data.courseSpecs.courseLearningOutcomes;
   const competences = courseInstance.data.course.competences;
@@ -146,6 +151,8 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
     avg = sum / count;
     avgCompsIndir.push({ code: competences[i].code, avg });
   }
+  report.avgLOSInDirect = avgLOSIndir;
+  report.avgCompetencesInDirect = avgCompsIndir;
   //check if the submission is already there
   if (surveySubmissions.length == 0) {
     const doc = await Sumbission.create({
@@ -164,10 +171,7 @@ exports.addSumbission = catchAsync(async (req, res, next) => {
     axios.patch(
       `http://courses:8080/created-courses/${survey.courseInstance}`,
       {
-        report: {
-          avgLOSInDirect: avgLOSIndir,
-          avgCompetencesInDirect: avgCompsIndir,
-        },
+        report: report,
       },
       {
         headers: { authorization: `Bearer ${token}` },
