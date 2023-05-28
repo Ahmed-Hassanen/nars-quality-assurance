@@ -579,3 +579,29 @@ exports.getReportPdf = catchAsync(async (req, res, next) => {
   //   data: exam,
   // });
 });
+
+exports.addImprovementSuggestion = catchAsync(async (req, res, next) => {
+  let query = CourseInstance.findById(req.params.id);
+  //if (popOptions) query = query.populate(popOptions);
+  const courseinstance = await query;
+
+  if (!courseinstance) {
+    return next(new AppError("No courseinstance found with that id", 404));
+  }
+  if (!courseinstance.active) {
+    return next(new AppError("That courseinstance not active", 404));
+  }
+  courseinstance.imporvementSuggestions.push(req.body.imporvementSuggestion);
+  const courseInstance = await CourseInstance.findByIdAndUpdate(
+    req.params.id,
+    courseinstance,
+    {
+      new: true, //return updated document
+      runValidators: true,
+    }
+  );
+  res.status(200).json({
+    status: "success",
+    data: courseInstance.imporvementSuggestions,
+  });
+});

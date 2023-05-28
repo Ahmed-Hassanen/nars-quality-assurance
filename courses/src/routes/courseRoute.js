@@ -59,5 +59,8 @@ router
 router
   .route("/assign-course-instructor")
   .patch(protect, courseController.assignCourseInstructor);
+router
+  .route("/created-courses/addImprovementSuggestion/:id")
+  .patch(protect, courseController.addImprovementSuggestion);
 
 module.exports = router;

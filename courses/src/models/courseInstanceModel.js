@@ -204,6 +204,8 @@ const courseInstanceSchema = new mongoose.Schema({
       ],
     },
   },
+  imporvementSuggestions: [String],
+  imporvementSuggestion: String,
 });
 
 courseInstanceSchema.pre(/^find/, function (next) {
