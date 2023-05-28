@@ -77,7 +77,6 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   console.log("Year is " + orignalCourse.academicYear);
   let url;
   if (orignalCourse.program) {
-    console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
     url = `http://users:8080/students/?program=${orignalCourse.program}&academicYear.0=${orignalCourse.academicYear}`;
   } else if (orignalCourse.department)
     url = `http://users:8080/students/?department=${orignalCourse.department}&academicYear.0=${orignalCourse.academicYear}`;
@@ -124,12 +123,16 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
     courseSpecs = course.courseSpecs;
   }
 
-  const courseinstance = await CourseInstance.create(req.body);
-  courseinstance.courseSpecs = courseSpecs;
-  await courseinstance.save();
+  const courseInstance = await CourseInstance.create(req.body);
+  if (courseSpecs) {
+    courseInstance.courseSpecs = courseSpecs;
+    courseInstance.courseSpecsCompleted = true;
+    await courseInstance.save();
+  }
+
   const updatedStudents = [];
   studentsData.data.forEach((student) => {
-    student.courses.push(courseinstance._id);
+    student.courses.push(courseInstance._id);
     console.log(student.courses);
     updatedStudents.push(
       axios.patch(
@@ -145,7 +148,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
   });
   const newOriginalCourse = await Course.findByIdAndUpdate(
     req.body.course,
-    { currentInstance: courseinstance._id },
+    { currentInstance: courseInstance._id },
     {
       new: true, //return updated document
       runValidators: true,
@@ -156,7 +159,7 @@ exports.createCourseInstance = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
-    data: courseinstance,
+    data: courseInstance,
   });
 });
 
