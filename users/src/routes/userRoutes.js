@@ -31,11 +31,7 @@ router
   .route("/students/:id")
   .get(authController.protect, studentController.getStudent)
   .patch(authController.protect, studentController.updateStudent)
-  .delete(
-    authController.protect,
-    authController.restrictTo("system admin"),
-    studentController.deleteStudent
-  );
+  .delete(authController.protect, studentController.deleteStudent);
 
 router
   .route("/students/updateMe/:id")
@@ -89,11 +85,7 @@ router
   .route("/staff/:id")
   .get(authController.protect, staffController.getStaff)
   .patch(authController.protect, staffController.updateStaff)
-  .delete(
-    authController.protect,
-    authController.restrictTo("system admin"),
-    staffController.deleteStaff
-  );
+  .delete(authController.protect, staffController.deleteStaff);
 
 router.route("/is-protected").post(authController.protectRequest);
 router.route("/is-restricted").post(authController.restrictRequest);

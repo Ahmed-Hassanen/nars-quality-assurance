@@ -82,24 +82,24 @@ exports.getCourses = catchAsync(async (req, res, next) => {
   });
 });
 exports.createStudent = catchAsync(async (req, res, next) => {
-  const header = `authorization: Bearer ${req.cookies.jwt}`;
+  // const header = `authorization: Bearer ${req.cookies.jwt}`;
 
-  const faculty = await axios
-    .get(`http://faculty:8080/getFacultySummary/${req.body.faculty}`, {
-      headers: header,
-    })
-    .then((res) => res.data)
-    .catch((e) => {
-      return {
-        status: false,
-        message: "something went wrong",
-        code: 500,
-      };
-    });
-  if (faculty.status === false) {
-    return next(new AppError(faculty.message, faculty.code));
-  }
-  req.body.academicYear = faculty.data.academicYears;
+  // const faculty = await axios
+  //   .get(`http://faculty:8080/getFacultySummary/${req.body.faculty}`, {
+  //     headers: header,
+  //   })
+  //   .then((res) => res.data)
+  //   .catch((e) => {
+  //     return {
+  //       status: false,
+  //       message: "something went wrong",
+  //       code: 500,
+  //     };
+  //   });
+  // if (faculty.status === false) {
+  //   return next(new AppError(faculty.message, faculty.code));
+  // }
+  // req.body.academicYear = faculty.data.academicYears;
   const doc = await Student.create(req.body);
   res.status(201).json({
     status: "success",
