@@ -16,9 +16,6 @@ router
     programController.addProgramReport
   );
 router.route("/programReport/:id").get(programController.getProgramReport);
-router
-  .route("/viewImprovementSuggestions/:id")
-  .get(programController.viewImprovementSuggestions);
 
 router.get("/getProgramSummary/:id", programController.getProgramSummary);
 router.route("/viewComp/:id").get(protect, programController.viewComp);
