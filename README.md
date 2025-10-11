@@ -92,7 +92,7 @@ cd nars-quality-assurance
 docker-compose up --build
 ```
 
-Visit: http://localhost: &lt;port&gt;
+Visit: localhost:&lt;port&gt;/
 
 To stop:
 
@@ -109,7 +109,8 @@ docker-compose down
 You can interact with the system via:
 
 - **Web Interface:** Localhost or deployed domain  
-- **API:** REST endpoints (see below)  
+- **API:** REST endpoints (see in full [Documentation](https://drive.google.com/file/d/17pQilTzCXtROlvrsKaBzMITSepdkg5Dg/view?usp=sharing))  
+![End Points](./endPoints.png)
 
 ---
 
@@ -122,8 +123,11 @@ You can interact with the system via:
 ![Course Report 6](./courseReport6.jpg)
 ![Course Report 7](./courseReport7.jpg)
 
+
 ---
 
-## 📡 API Endpoints (Skeleton)
+## Full Documentation
+[Documentation](https://drive.google.com/file/d/17pQilTzCXtROlvrsKaBzMITSepdkg5Dg/view?usp=sharing)
+
 
 
