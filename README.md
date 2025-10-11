@@ -92,7 +92,7 @@ cd nars-quality-assurance
 docker-compose up --build
 ```
 
-Visit: http://localhost:&lt;port&gt;
+Visit: http://localhost: &lt;port&gt;
 
 To stop:
 
