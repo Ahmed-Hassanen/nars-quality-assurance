@@ -37,7 +37,6 @@ It provides structured modules for competencies, courses, programs, surveys, use
 ├── surveys
 ├── users
 ├── docker-compose.yml
-├── .gitignore
 └── README.md
 ```
 
