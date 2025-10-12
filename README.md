@@ -55,13 +55,14 @@ It provides structured modules for competencies, courses, programs, surveys, use
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Backend:** Node.js
-- **Containerization:** Docker, Docker Compose  
-- **Web Server / Proxy:** Nginx  
-- **Database:** MongoDB
-
+| Layer | Technology |
+|---|---|
+| Backend | Node.js, Express.js |
+| Database | MongoDB |
+| ORM / ODM | Mongoose |
+| Web Server / Proxy | Nginx |
+| Authentication | JWT |
+| Dev / Ops | Docker, Docker Compose |
 ---
 
 ## ⚙️ Getting Started
